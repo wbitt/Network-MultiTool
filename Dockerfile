@@ -2,7 +2,7 @@ FROM centos
 MAINTAINER Kamran Azeem (kaz@praqma.net) (kamranazeem@gmail.com)
 
 # Install some tools in a centos container, as busybox does not have enough troubleshooting tools.
-RUN yum -y install bind-utils net-tools nmap tcpdump telnet httpd && yum clean all 
+RUN yum -y install bind-utils net-tools nmap tcpdump telnet httpd traceroute mtr openssh-clients && yum clean all 
 
 # Interesting:
 # Users of this image may wonder, why this multitool runs a web server? Well, when we use this with Kubernetes,
