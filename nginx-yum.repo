@@ -1,0 +1,8 @@
+[nginx]
+name=nginx repo
+# baseurl=http://nginx.org/packages/OS/OSRELEASE/$basearch/
+# Replace OS with rhel or centos , and OSRELEASE with 6 or 7.
+
+baseurl=http://nginx.org/packages/centos/7/$basearch/
+gpgcheck=0
+enabled=1
