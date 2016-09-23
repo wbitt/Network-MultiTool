@@ -26,7 +26,12 @@ RUN yum -y install bind-utils net-tools nmap tcpdump telnet traceroute mtr opens
 # Personally, I think this is cool!
 
 # Copy a simple index.html , to eliminate text noise, when you curl the container on port 80.
-COPY index.html /var/www/html
+
+## Use the path below for apache 
+## COPY index.html /var/www/html
+
+# Use the path below for nginx
+COPY index.html /usr/share/nginx/html/
 
 EXPOSE 80 443
 
