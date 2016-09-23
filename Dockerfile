@@ -1,8 +1,12 @@
 FROM centos
 MAINTAINER Kamran Azeem (kaz@praqma.net) (kamranazeem@gmail.com)
 
+# Copy the NGINX yum repo file into /etc/yum.repos.d/
+ 
+COPY nginx-yum.repo /etc/yum.repos.d/
+
 # Install some tools in a centos container, as busybox does not have enough troubleshooting tools.
-RUN yum -y install bind-utils net-tools nmap tcpdump telnet httpd traceroute mtr openssh-clients && yum clean all 
+RUN yum -y install bind-utils net-tools nmap tcpdump telnet traceroute mtr openssh-clients nginx && yum clean all 
 
 # Interesting:
 # Users of this image may wonder, why this multitool runs a web server? Well, when we use this with Kubernetes,
@@ -24,8 +28,16 @@ RUN yum -y install bind-utils net-tools nmap tcpdump telnet httpd traceroute mtr
 # Copy a simple index.html , to eliminate text noise, when you curl the container on port 80.
 COPY index.html /var/www/html
 
+EXPOSE 80 443
+
 # CMD ["executable","param1","param2"]
-CMD ["apachectl", "-D", "FOREGROUND"]
+
+# Use the following for apache, if you are using that. 
+## CMD ["apachectl", "-D", "FOREGROUND"]
+
+# Use the following for nginx, if you are using that.
+CMD ["nginx", "-g", "daemon off;"]
+
 
 # Build and Push (to dockerhub) instructions:
 # -------------------------------------------
