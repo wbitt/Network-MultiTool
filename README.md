@@ -1,11 +1,10 @@
-# CENTOS-MultiTool
-A cool multitool for trouble shooting troubleshooting container networking. Includes nginx web server too!
+# Network-MultiTool
+A cool multitool, based on CENTOS, for troubleshooting container networking. Includes nginx web server too!
 
-Downloadable from Docker Hub: 
-(Use any of the following, which works)
-
-* [https://hub.docker.com/u/praqma/centos-multitool/](https://hub.docker.com/u/praqma/centos-multitool/)
-* [https://hub.docker.com/r/kamranazeem/centos-multitool/](https://hub.docker.com/r/kamranazeem/centos-multitool/)
+## Downloadable from Docker Hub: 
+Use any of the following links:
+* [https://hub.docker.com/u/praqma/network-multitool/](https://hub.docker.com/u/praqma/network-multitool/)
+* [https://hub.docker.com/r/kamranazeem/network-multitool/](https://hub.docker.com/r/kamranazeem/network-multitool/)
 
 # Tools included:
 * Nginx Web Server (port 80)
@@ -20,5 +19,3 @@ Downloadable from Docker Hub:
 * telnet client, ssh client
 * traceroute, tracepath, mtr
 * yum, rpm 
-
-
