@@ -1,5 +1,7 @@
 # Network-MultiTool
-A cool multitool, based on CENTOS, for troubleshooting container networking. Includes nginx web server too!
+Multitool container network troubleshooting.
+
+A cool multitool, based on CENTOS, for troubleshooting container networking.
 
 ## Downloadable from Docker Hub: 
 Use any of the following links:
