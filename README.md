@@ -1,5 +1,5 @@
 # Network-MultiTool
-Multitool for container network troubleshooting. based on CENTOS.
+Multitool for container network troubleshooting. Based on CENTOS.
 
 ## Downloadable from Docker Hub: 
 Use any of the following links:
