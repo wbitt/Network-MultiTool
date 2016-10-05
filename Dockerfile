@@ -46,13 +46,13 @@ CMD ["nginx", "-g", "daemon off;"]
 
 # Build and Push (to dockerhub) instructions:
 # -------------------------------------------
-# docker build -t centos-multitool .
-# docker tag centos-multitool kamranazeem/centos-multitool
+# docker build -t network-multitool .
+# docker tag network-multitool kamranazeem/network-multitool
 # docker login
-# docker push kamranazeem/centos-multitool
+# docker push kamranazeem/network-multitool
 
 # Pull (from dockerhub) and Usage:
 # --------------------------------
-# docker pull kamranazeem/centos-multitool
+# docker pull kamranazeem/network-multitool
 
-# docker run --rm -it kamranazeem/centos-multitool /bin/bash 
+# docker run --rm -it kamranazeem/network-multitool /bin/bash 
