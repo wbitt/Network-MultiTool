@@ -3,7 +3,7 @@ Multitool for container network troubleshooting. Based on CENTOS.
 
 ## Downloadable from Docker Hub: 
 Use any of the following links:
-* [https://hub.docker.com/r/praqma/network-multitool/](https://hub.docker.com/r/praqma/network-multitool/)
+* [https://hub.docker.com/r/praqma/network-multitool/](https://hub.docker.com/r/praqma/network-multitool/)  (Automated Build)
 * [https://hub.docker.com/r/kamranazeem/network-multitool/](https://hub.docker.com/r/kamranazeem/network-multitool/)
 
 # Tools included:
