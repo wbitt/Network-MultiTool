@@ -35,13 +35,18 @@ COPY index.html /usr/share/nginx/html/
 
 EXPOSE 80 443
 
+COPY start_nginx.sh /
+
 # CMD ["executable","param1","param2"]
 
 # Use the following for apache, if you are using that. 
 ## CMD ["apachectl", "-D", "FOREGROUND"]
 
 # Use the following for nginx, if you are using that.
-CMD ["nginx", "-g", "daemon off;"]
+## CMD ["nginx", "-g", "daemon off;"]
+
+# Run the startup script instead, which updates the index.html with our hostname, and starts nginx.
+CMD ["/start_nginx.sh"]
 
 
 # Build and Push (to dockerhub) instructions:
