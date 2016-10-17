@@ -25,13 +25,16 @@ RUN yum -y install bind-utils net-tools nmap tcpdump telnet traceroute mtr opens
 # in a multitool is like having yet another tool. Now you can do simple connectivity tests to the webserver too!
 # Personally, I think this is cool!
 
-# Copy a simple index.html , to eliminate text noise, when you curl the container on port 80.
+# Copy a simple index.html to eliminate text noise when you curl the container on port 80.
 
 ## Use the path below for apache 
 ## COPY index.html /var/www/html
 
 # Use the path below for nginx
 COPY index.html /usr/share/nginx/html/
+
+# Copy a custom nginx.conf with log files redirected to stderr and stdout
+COPY nginx.conf /etc/nginx/nginx.conf
 
 EXPOSE 80 443
 
