@@ -6,7 +6,7 @@ MAINTAINER Kamran Azeem (kaz@praqma.net) (kamranazeem@gmail.com)
 COPY nginx-yum.repo /etc/yum.repos.d/
 
 # Install some tools in a centos container, as busybox does not have enough troubleshooting tools.
-RUN yum -y install bind-utils net-tools nmap tcpdump telnet traceroute mtr openssh-clients nginx && yum clean all  && mkdir /certs && chmod 700 /certs
+RUN yum -y install bind-utils iproute net-tools nmap tcpdump telnet traceroute mtr openssh-clients nginx && yum clean all  && mkdir /certs && chmod 700 /certs
 
 # Interesting:
 # Users of this image may wonder, why this multitool runs a web server? Well, when we use this with Kubernetes,
