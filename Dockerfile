@@ -1,4 +1,4 @@
-FROM centos
+FROM centos:7
 MAINTAINER Kamran Azeem (kaz@praqma.net) (kamranazeem@gmail.com)
 
 # Copy the NGINX yum repo file into /etc/yum.repos.d/
@@ -6,7 +6,10 @@ MAINTAINER Kamran Azeem (kaz@praqma.net) (kamranazeem@gmail.com)
 COPY nginx-yum.repo /etc/yum.repos.d/
 
 # Install some tools in a centos container, as busybox does not have enough troubleshooting tools.
-RUN yum -y install bind-utils iproute net-tools nmap tcpdump telnet traceroute mtr openssh-clients nginx && yum clean all  && mkdir /certs && chmod 700 /certs
+RUN    yum -y install bind-utils iproute net-tools nmap tcpdump telnet traceroute mtr openssh-clients nginx postgresql mariadb \
+    && yum clean all  \
+    && mkdir /certs \
+    && chmod 700 /certs
 
 # Interesting:
 # Users of this image may wonder, why this multitool runs a web server? Well, when we use this with Kubernetes,
@@ -16,10 +19,10 @@ RUN yum -y install bind-utils iproute net-tools nmap tcpdump telnet traceroute m
 #   then it is best to 'also' run a web server and setup the image to do so by default. 
 
 # This helps when you are on kubernetes platform and simply say:
-# $ kubectl run centos-multitool --image=kamranazeem/centos-multitool --replicas=1
+# $ kubectl run multitool --image=praqma/network-multitool --replicas=1
 
 # It starts , as web server, then then you simply connect to it using:
-# $ kubectl exec centos-multitool-3822887632-pwlr1  -i -t -- "bash" 
+# $ kubectl exec -it multitool-3822887632-pwlr1  bash 
 
 # That is why it is good to have a webserver in this tool. Besides, I believe that having a web server 
 # in a multitool is like having yet another tool. Now you can do simple connectivity tests to the webserver too!
