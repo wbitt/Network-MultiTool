@@ -1,40 +1,33 @@
-FROM centos:7
-MAINTAINER Kamran Azeem (kaz@praqma.net) (kamranazeem@gmail.com)
+FROM fedora:27
+MAINTAINER Kamran Azeem & Henrik Høegh (kaz@praqma.net, heh@praqma.net)
 
-# Copy the NGINX yum repo file into /etc/yum.repos.d/
- 
-COPY nginx-yum.repo /etc/yum.repos.d/
-
-# Install some tools in a centos container, as busybox does not have enough troubleshooting tools.
-RUN    yum -y install bind-utils iproute net-tools nmap tcpdump telnet traceroute mtr openssh-clients nginx postgresql mariadb \
+# Install some tools in the container.
+RUN    yum -y install bind-utils iproute net-tools nmap tcpdump telnet traceroute mtr openssh-clients nginx postgresql mariadb nmap-ncat rsync ftp jq \
     && yum clean all  \
     && mkdir /certs \
     && chmod 700 /certs
 
 # Interesting:
-# Users of this image may wonder, why this multitool runs a web server? Well, when we use this with Kubernetes,
-#   for troubleshooting purpose, then a simple image means creating a special deployment.yaml file, 
-#   which keeps the pod alive, so we can connect to it and do our testing, etc.
-# If you do not want to create that extra file (you normally first lookup the internet for such file - waste of time),
-#   then it is best to 'also' run a web server and setup the image to do so by default. 
+# Users of this image may wonder, why this multitool runs a web server? 
+# Well, normally, if a container does not run a daemon, 
+#   ,then running it involves creating a special deployment.yaml file, 
+#   ,which keeps the pod alive, so we can connect to it and do our testing, etc.
+# If you don't want to create that extra file, 
+#   ,then it is best to 'also' run a web server (as a daemon) in the container - as default process.
+# This helps when you are on kubernetes platform and simply execute:
+#   $ kubectl run multitool --image=praqma/network-multitool --replicas=1
 
-# This helps when you are on kubernetes platform and simply say:
-# $ kubectl run multitool --image=praqma/network-multitool --replicas=1
+# The multitool container starts - as web server. Then, you simply connect to it using:
+#   $ kubectl exec -it multitool-3822887632-pwlr1  bash 
 
-# It starts , as web server, then then you simply connect to it using:
-# $ kubectl exec -it multitool-3822887632-pwlr1  bash 
+# This is why it is good to have a webserver in this tool. 
+# Besides, I believe that having a web server in a multitool is like having yet another tool! 
+# Personally, I think this is cool! Henrik thinks the same!
 
-# That is why it is good to have a webserver in this tool. Besides, I believe that having a web server 
-# in a multitool is like having yet another tool. Now you can do simple connectivity tests to the webserver too!
-# Personally, I think this is cool!
-
-# Copy a simple index.html to eliminate text noise when you curl the container on port 80.
-
-## Use the path below for apache 
-## COPY index.html /var/www/html
-
-# Use the path below for nginx
+# Copy a simple index.html to eliminate text (index.html) noise which comes with default nginx image.
+# (I created an issue for this purpose here: https://github.com/nginxinc/docker-nginx/issues/234)
 COPY index.html /usr/share/nginx/html/
+
 
 # Copy a custom nginx.conf with log files redirected to stderr and stdout
 COPY nginx.conf /etc/nginx/nginx.conf
@@ -45,27 +38,32 @@ EXPOSE 80 443
 
 COPY start_nginx.sh /
 
-# CMD ["executable","param1","param2"]
-
-# Use the following for apache, if you are using that. 
-## CMD ["apachectl", "-D", "FOREGROUND"]
-
-# Use the following for nginx, if you are using that.
-## CMD ["nginx", "-g", "daemon off;"]
-
 # Run the startup script instead, which updates the index.html with our hostname, and starts nginx.
 CMD ["/start_nginx.sh"]
 
 
+###################################################################################################
+
 # Build and Push (to dockerhub) instructions:
 # -------------------------------------------
 # docker build -t network-multitool .
-# docker tag network-multitool kamranazeem/network-multitool
+# docker tag network-multitool praqma/network-multitool
 # docker login
-# docker push kamranazeem/network-multitool
+# docker push praqma/network-multitool
 
-# Pull (from dockerhub) and Usage:
-# --------------------------------
-# docker pull kamranazeem/network-multitool
 
-# docker run --rm -it kamranazeem/network-multitool /bin/bash 
+# Pull (from dockerhub):
+# ----------------------
+# docker pull praqma/network-multitool
+
+
+# Usage - on Docker:
+# ------------------
+# docker run --rm -it praqma/network-multitool /bin/bash 
+# OR
+# docker run -p 80:80 -p 443:443 -d  praqma/network-multitool
+
+
+# Usage - on Kubernetes:
+# ---------------------
+# kubectl run multitool --image=praqma/network-multitool --replicas=1
