@@ -2,7 +2,7 @@ FROM fedora:27
 MAINTAINER Kamran Azeem & Henrik Høegh (kaz@praqma.net, heh@praqma.net)
 
 # Install some tools in the container.
-RUN    yum -y install bind-utils iproute net-tools nmap tcpdump telnet traceroute mtr openssh-clients nginx postgresql mariadb nmap-ncat rsync ftp jq \
+RUN    yum -y install bind-utils iproute net-tools nmap tcpdump telnet traceroute mtr openssh-clients nginx postgresql mariadb nmap-ncat rsync ftp jq git \
     && yum clean all  \
     && mkdir /certs \
     && chmod 700 /certs
