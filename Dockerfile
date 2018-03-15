@@ -2,7 +2,7 @@ FROM fedora:27
 MAINTAINER Kamran Azeem & Henrik Høegh (kaz@praqma.net, heh@praqma.net)
 
 # Install some tools in the container.
-RUN    yum -y install procps-ng bind-utils iproute net-tools nmap tcpdump telnet traceroute mtr openssh-clients nginx postgresql mariadb nmap-ncat rsync ftp jq git \
+RUN    yum -y install procps-ng hostname bind-utils iproute net-tools nmap tcpdump telnet traceroute mtr openssh-clients nginx postgresql mariadb nmap-ncat rsync ftp jq git \
     && yum clean all  \
     && mkdir /certs \
     && chmod 700 /certs
@@ -32,6 +32,7 @@ COPY index.html /usr/share/nginx/html/
 # Copy a custom nginx.conf with log files redirected to stderr and stdout
 COPY nginx.conf /etc/nginx/nginx.conf
 COPY nginx-ssl.conf /etc/nginx/conf.d/
+COPY nginx-http.conf /etc/nginx/conf.d/
 COPY server.* /certs/
 
 EXPOSE 80 443
