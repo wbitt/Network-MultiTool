@@ -1,16 +1,11 @@
-FROM alpine
+FROM fedora:27
 MAINTAINER Kamran Azeem & Henrik Høegh (kaz@praqma.net, heh@praqma.net)
 
 # Install some tools in the container.
-RUN     apk update \
-    &&  apk add nginx bind-tools curl wget nmap procps tcpdump busybox-extras mtr openssh-client postgresql-client mysql-client rsync jq git iputils lftp netcat-openbsd iproute2 net-tools bash perl-net-telnet \
+RUN    yum -y install procps-ng hostname bind-utils iputils iproute net-tools nmap tcpdump telnet traceroute mtr openssh-clients nginx postgresql mariadb nmap-ncat rsync ftp jq git \
+    && yum clean all  \
     && mkdir /certs \
     && chmod 700 /certs
-
-# telnet  ruby-net-telnet perl-net-telnet
- 
-
-
 
 # Interesting:
 # Users of this image may wonder, why this multitool runs a web server? 
@@ -41,10 +36,10 @@ COPY server.* /certs/
 
 EXPOSE 80 443
 
-COPY docker-entrypoint.sh /
+COPY start_nginx.sh /
 
 # Run the startup script instead, which updates the index.html with our hostname, and starts nginx.
-CMD ["/docker-entrypoint.sh"]
+CMD ["/start_nginx.sh"]
 
 
 ###################################################################################################
