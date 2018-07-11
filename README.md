@@ -1,6 +1,4 @@
 # Network-MultiTool
-... because busybox doesn't have all the tools!
-
 This is a multitool for container/network testing and troubleshooting. It is based on Fedora Linux. The container starts nginx web server and listens on port 80 and 443. This helps to run it in a straight forward way and use it to run various commands for troubleshooting whatever you are troubleshooting.
 
 ## Downloadable from Docker Hub: 

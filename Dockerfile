@@ -7,10 +7,6 @@ RUN     apk update \
     && mkdir /certs \
     && chmod 700 /certs
 
-# telnet  ruby-net-telnet perl-net-telnet
- 
-
-
 
 # Interesting:
 # Users of this image may wonder, why this multitool runs a web server? 
@@ -36,7 +32,7 @@ COPY index.html /usr/share/nginx/html/
 
 # Copy a custom nginx.conf with log files redirected to stderr and stdout
 COPY nginx.conf /etc/nginx/nginx.conf
-COPY nginx-connectors.conf /etc/nginx/conf.d/
+COPY nginx-connectors.conf /etc/nginx/conf.d/default.conf
 COPY server.* /certs/
 
 EXPOSE 80 443
