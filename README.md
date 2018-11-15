@@ -17,7 +17,7 @@ This is a multitool for container/network testing and troubleshooting. It is ori
 * tcpdump
 * telnet client, ssh client, ftp client, rsync
 * traceroute, tracepath, mtr
-* netcat (nc)
+* netcat (nc), socat
 * jq
 * git
 
