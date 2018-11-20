@@ -7,7 +7,7 @@ This is a multitool for container/network testing and troubleshooting. It is ori
 # Tools included:
 * apk package manager
 * Nginx Web Server (port 80, port 443)
-* wget, curl
+* wget, curl, iperf3
 * dig, nslookup
 * ip, ifconfig, mii-tool, route
 * ping, nmap, arp, arping
