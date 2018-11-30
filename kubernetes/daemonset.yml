@@ -1,0 +1,31 @@
+apiVersion: extensions/v1beta1
+kind: DaemonSet
+metadata:
+  name: network-multitool
+  namespace: kube-system
+  labels:
+    tier: node
+    app: network-multitool
+spec:
+  template:
+    metadata:
+      labels:
+        tier: node
+        app: network-multitool
+    spec:
+      hostNetwork: true
+      tolerations:
+      - operator: Exists
+        effect: NoSchedule
+      containers:
+      - name: network-multitool
+        image: praqma/network-multitool
+        resources:
+          requests:
+            cpu: "50m"
+            memory: "50Mi"
+          limits:
+            cpu: "50m"
+            memory: "50Mi"
+        securityContext:
+          privileged: true
