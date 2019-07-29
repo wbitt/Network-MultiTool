@@ -4,9 +4,18 @@ HOSTNAME=$(hostname)
 CONTAINER_IP=$(ip addr show eth0 | grep -w inet| awk '{print $2}')
 
 
-# echo "<HR>" >> /usr/share/nginx/html/index.html 
-# echo "<p>Container hostname: ${HOSTNAME} <BR>" >> /usr/share/nginx/html/index.html
-# echo "Container IP: ${CONTAINER_IP} <BR></p>" >> /usr/share/nginx/html/index.html
+# Modify/Replace default listening ports 80 and 443 to whatever the user wants.
+# This works only if the env variables HTTP_PORT and HTTPS_PORT are defined.
+# If these variables are not defined, then the default ports 80 and 443 are used.
+
+if [ -n "${HTTP_PORT}" ]; then
+  sed -i "s/80/${HTTP_PORT}/g"  /etc/nginx/conf.d/default.conf
+fi
+
+if [ -n "${HTTPS_PORT}" ]; then
+  sed -i "s/443/${HTTPS_PORT}/g"  /etc/nginx/conf.d/default.conf
+fi
+
 
 # Reduced the information in just one line. It overwrites the default text, 
 #   indicating that our startup script ran correctly.
