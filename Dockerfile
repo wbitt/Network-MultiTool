@@ -39,16 +39,21 @@ EXPOSE 80 443
 
 COPY docker-entrypoint.sh /
 
-# Run the startup script instead, which updates the index.html with our hostname, and starts nginx.
-CMD ["/docker-entrypoint.sh"]
+
+# Run the startup script as ENTRYPOINT, which does few things and then starts nginx.
+ENTRYPOINT ["/docker-entrypoint.sh"]
+
+
+# Start nginx in foreground:
+CMD ["nginx", "-g", "daemon off;"]
 
 
 ###################################################################################################
 
 # Build and Push (to dockerhub) instructions:
 # -------------------------------------------
-# docker build -t network-multitool .
-# docker tag network-multitool praqma/network-multitool
+# docker build -t local/network-multitool .
+# docker tag local/network-multitool praqma/network-multitool
 # docker login
 # docker push praqma/network-multitool
 
@@ -62,7 +67,11 @@ CMD ["/docker-entrypoint.sh"]
 # ------------------
 # docker run --rm -it praqma/network-multitool /bin/bash 
 # OR
+# docker run -d  praqma/network-multitool
+# OR
 # docker run -p 80:80 -p 443:443 -d  praqma/network-multitool
+# OR
+# docker run -e HTTP_PORT=1080 -e HTTPS_PORT=1443 -p 1080:1080 -p 1443:1443 -d  praqma/network-multitool
 
 
 # Usage - on Kubernetes:
