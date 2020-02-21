@@ -15,7 +15,7 @@ This is a multitool for container/network testing and troubleshooting. It was or
 * netstat, ss
 * gzip, cpio
 * tcpdump
-* telnet client, ssh client, ftp client, rsync
+* telnet client, ssh client, ftp client, rsync, tshark
 * traceroute, tracepath, mtr
 * netcat (nc), socat
 * ApacheBench (ab)
