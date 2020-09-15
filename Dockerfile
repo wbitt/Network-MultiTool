@@ -1,49 +1,29 @@
-FROM alpine
+FROM alpine:3.12
+
 MAINTAINER Kamran Azeem & Henrik Høegh (kaz@praqma.net, heh@praqma.net)
 
-# Install some tools in the container.
+EXPOSE 80 443
+
+# Install some tools in the container and generate self-signed SSL certificates.
 # Packages are listed in alphabetical order, for ease of readability and ease of maintenance.
 RUN     apk update \
     &&  apk add apache2-utils bash bind-tools busybox-extras curl ethtool git \
                 iperf3 iproute2 iputils jq lftp mtr mysql-client \
                 netcat-openbsd net-tools nginx nmap openssh-client openssl \
-	        perl-net-telnet postgresql-client procps rsync socat tcpdump tshark wget \
+	            perl-net-telnet postgresql-client procps rsync socat tcpdump tshark wget \
     &&  mkdir /certs \
-    &&  chmod 700 /certs
+    &&  chmod 700 /certs \
+    &&  openssl req \
+        -x509 -newkey rsa:2048 -nodes -days 3650 \
+        -keyout /certs/server.key -out /certs/server.crt -subj '/CN=localhost'
 
-
-# Interesting:
-# Users of this image may wonder, why this multitool runs a web server? 
-# Well, normally, if a container does not run a daemon, 
-#   ,then running it involves using creative ways / hacks to keep it alive.
-# If you don't want to suddenly start browsing the internet for "those creative ways",
-#  ,then it is best to run a web server in the container - as the default process.
-# This helps when you are on kubernetes platform and simply execute:
-#   $ kubectl run multitool --image=praqma/network-multitool --replicas=1
-# Or, on Docker:
-#   $ docker run  -d praqma/network-multitool
-
-# The multitool container starts as web server. Then, you simply connect to it using:
-#   $ kubectl exec -it multitool-3822887632-pwlr1  bash
-# Or, on Docker:
-#   $ docker exec -it silly-container-name bash 
-
-# This is why it is good to have a webserver in this tool. Hope this answers the question!
-#
-# Besides, I believe that having a web server in a multitool is like having yet another tool! 
-# Personally, I think this is cool! Henrik thinks the same!
 
 # Copy a simple index.html to eliminate text (index.html) noise which comes with default nginx image.
 # (I created an issue for this purpose here: https://github.com/nginxinc/docker-nginx/issues/234)
 COPY index.html /usr/share/nginx/html/
 
-
 # Copy a custom nginx.conf with log files redirected to stderr and stdout
 COPY nginx.conf /etc/nginx/nginx.conf
-COPY nginx-connectors.conf /etc/nginx/conf.d/default.conf
-COPY server.* /certs/
-
-EXPOSE 80 443
 
 COPY docker-entrypoint.sh /
 
