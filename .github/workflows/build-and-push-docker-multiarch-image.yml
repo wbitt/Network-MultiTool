@@ -1,0 +1,62 @@
+name: Docker Image Build and Push - CI Workflow
+
+on:
+  push:
+    branches: master
+    tags:
+      - alpine-*
+
+jobs:
+  build-and-push-muti-arch-docker-image:
+    runs-on: ubuntu-latest
+    env:
+      DOCKER_IMAGE: network-multitool
+      DOCKERHUB_ORGNAME: praqma
+      DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+      # 
+      # DOCKERHUB_USERNAME and DOCKERHUB_TOKEN are to be set in the GITHUB WEB UI,
+      #   under RepoName -> Settings -> Secrets
+    
+    steps:
+
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Prepare Docker Image Tags
+        id: prep
+        run: |
+          SHORT_REF=$(basename ${GITHUB_REF})
+          SHORT_HASH=${GITHUB_SHA::7}
+          TAGS=""
+          if [[ ! -z "${SHORT_REF}" && "${SHORT_REF}" == "master" ]]; then 
+            echo "Found git commit on master branch. Setting docker image tag as: 'latest'" 
+            TAG=${DOCKERHUB_ORGNAME}/${DOCKER_IMAGE}:latest
+          fi  
+          if [[ ! -z "${SHORT_REF}" && "${SHORT_REF}" != "master" ]]; then 
+            echo "Found git tag. Setting docker image tag as: '${SHORT_REF}'" 
+            TAG=${DOCKERHUB_ORGNAME}/${DOCKER_IMAGE}:${SHORT_REF}
+          fi
+          TAGS="${TAG},${DOCKERHUB_ORGNAME}/${DOCKER_IMAGE}:${SHORT_HASH}"
+          echo "Complete Docker image-name and tags are setup as: ${TAGS}"
+          echo ::set-output name=tags::${TAGS}
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v1
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+
+      - name: Login to DockerHub
+        uses: docker/login-action@v1 
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build and push
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          file: ./Dockerfile
+          platforms: linux/386,linux/amd64,linux/arm/v6,linux/arm/v7,linux/arm64,linux/ppc64le,linux/s390x
+          push: true
+          tags: ${{ steps.prep.outputs.tags }}
