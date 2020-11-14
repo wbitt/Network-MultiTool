@@ -1,9 +1,10 @@
 # Network-Multitool
 A (**multi-arch**) multitool for container/network testing and troubleshooting, based on Alpine Linux. The container image contains lots of tools, as well as nginx web server, which listens on port 80 and 443 by default. The web server helps to run this container-image in a straight-forward way, so you can simply `exec` into the container and use various tools.
 
+Supported platforms: linux/386,linux/amd64,linux/arm/v7,linux/arm64,linux/ppc64le,linux/s390x
 
 ## Downloadable from Docker Hub: 
-* [https://hub.docker.com/r/praqma/network-multitool/](https://hub.docker.com/r/praqma/network-multitool/)  (Automated Build)
+* [https://hub.docker.com/r/praqma/network-multitool/](https://hub.docker.com/r/praqma/network-multitool/)  (Automated multi-arch Build)
 
 # Tools included:
 * apk package manager
