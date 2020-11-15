@@ -39,8 +39,8 @@ jobs:
           # Due to limitation/bug in current docker/build-push-action@v2 action,
           #   multiple tags in one buildx do not work as expected.
           #   So, only single tag is used, which is either 'latest' or 'alpine-x.y'.
-          # TAGS="${TAG},${DOCKERHUB_ORGNAME}/${DOCKER_IMAGE}:${SHORT_HASH}"
-          TAGS="${TAG}"
+          TAGS="${TAG},${DOCKERHUB_ORGNAME}/${DOCKER_IMAGE}:${SHORT_HASH}"
+          # TAGS="${TAG}"
           echo "Complete Docker image-name and tags are setup as: ${TAGS}"
           echo ::set-output name=tags::${TAGS}
 
