@@ -72,24 +72,29 @@ The container image contains lots of tools, as well as a `nginx` web server, whi
 * jq
 
 
-# Tools included in "fedora-extra"
-* date
+# Tools included in "fedora-es-db-tools"
+* YUM package manager
+* Nginx Web Server (port 80, port 443) - customizable ports!
+* wget, curl
+* dig, nslookup
+* ip, ifconfig, route, traceroute, tracepath, mtr
+* ping, arp, arping
+* ps, netstat
+* gzip, cpio, tar
+* telnet client
+* awk, cut, diff, find, grep, sed, vi editor, wc
+* jq, git
 * filebeat 
 * fluentbit
 * logstash
-* ip
-* nslookup
 * mutt
-* mysql client
-* oracle client (From: https://www.oracle.com/database/technologies/instant-client/linux-x86-64-downloads.html)
-* openldap
-* ldapsearch
-* ping
-* postfix
-* sftp
-* ssh
-* sftp
+* mysql client, postgresql client, oracle client
+* openldap, openldap-clients
 * openssl
+* postfix
+* ssh, sftp
+
+**Size:** 16 MB compressed, 1.6 GB uncompressed
 
 
 
