@@ -194,12 +194,12 @@ $ kubectl run multitool --image=praqma/network-multitool
 
 The multitool container starts as web server. Then, you simply connect to it using:
 ```
-$ docker exec -it some-silly-container-name bash 
+$ docker exec -it some-silly-container-name /bin/sh 
 ```
 
 Or, on Kubernetes:
 ```
-$ kubectl exec -it multitool-3822887632-pwlr1  -- bash
+$ kubectl exec -it multitool-3822887632-pwlr1  -- /bin/sh
 ```
 
 This is why it is good to have a web-server in this tool. Hope this answers the question! Besides, I believe that having a web server in a multitool is like having yet another tool! Personally, I think this is cool! [Henrik](https://www.linkedin.com/in/henrikrenehoegh/) thinks the same!
