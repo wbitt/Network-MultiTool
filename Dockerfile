@@ -39,28 +39,28 @@ CMD ["nginx", "-g", "daemon off;"]
 
 # Build and Push (to dockerhub) instructions:
 # -------------------------------------------
-# docker build -t local/network-multitool .
-# docker tag local/network-multitool praqma/network-multitool
+# docker build -t local/network-multitool:fedora .
+# docker tag local/network-multitool praqma/network-multitool:fedora
 # docker login
-# docker push praqma/network-multitool
+# docker push praqma/network-multitool:fedora
 
 
 # Pull (from dockerhub):
 # ----------------------
-# docker pull praqma/network-multitool
+# docker pull praqma/network-multitool:fedora
 
 
 # Usage - on Docker:
 # ------------------
-# docker run --rm -it praqma/network-multitool /bin/bash 
+# docker run --rm -it praqma/network-multitool:fedora /bin/sh 
 # OR
-# docker run -d  praqma/network-multitool
+# docker run -d  praqma/network-multitool:fedora
 # OR
-# docker run -p 80:80 -p 443:443 -d  praqma/network-multitool
+# docker run -p 80:80 -p 443:443 -d  praqma/network-multitool:fedora
 # OR
-# docker run -e HTTP_PORT=1080 -e HTTPS_PORT=1443 -p 1080:1080 -p 1443:1443 -d  praqma/network-multitool
+# docker run -e HTTP_PORT=1180 -e HTTPS_PORT=11443 -p 1180:1180 -p 11443:11443 -d  praqma/network-multitool:fedora
 
 
 # Usage - on Kubernetes:
 # ---------------------
-# kubectl run multitool --image=praqma/network-multitool --replicas=1
+# kubectl run multitool --image=praqma/network-multitool:fedora
