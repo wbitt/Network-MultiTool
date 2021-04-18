@@ -6,13 +6,20 @@
 
 WEB_ROOT=/usr/share/nginx/html
 MOUNT_CHECK=$(mount | grep ${WEB_ROOT})
+HOSTNAME=$(hostname)
 
 if [ -z "${MOUNT_CHECK}" ] ; then
   echo "The directory ${WEB_ROOT} is not mounted."
   echo "Over-writing the default index.html file with some useful information."
 
-  HOSTNAME=$(hostname)
-  CONTAINER_IP=$(ip addr show eth0 | grep -w inet| awk '{print $2}')
+  # CONTAINER_IP=$(ip addr show eth0 | grep -w inet| awk '{print $2}')
+  # Note:
+  #   CONTAINER IP cannot always be on device 'eth0'. 
+  #     It could be something else too, as pointed by @arnaudveron .
+  #   The 'ip -j route' shows JSON output, 
+  #     and always shows the default route as the first entry.
+  #     It also shows the correct device name as 'prefsrc', with correct IP address. 
+  CONTAINER_IP=$(ip -j route get 1 | jq -r '.[0] .prefsrc')
 
   # Reduced the information in just one line. It overwrites the default text.
   echo -e "Praqma Network MultiTool (with NGINX) - ${HOSTNAME} - ${CONTAINER_IP}" > ${WEB_ROOT}/index.html 
@@ -28,12 +35,12 @@ fi
 
 if [ -n "${HTTP_PORT}" ]; then
   echo "Replacing default HTTP port (80) with the value specified by the user - (HTTPS_PORT: ${HTTP_PORT})."
-  sed -i "s/80/${HTTP_PORT}/g"  /etc/nginx/conf.d/default.conf
+  sed -i "s/80/${HTTP_PORT}/g"  /etc/nginx/nginx.conf
 fi
 
 if [ -n "${HTTPS_PORT}" ]; then
   echo "Replacing default HTTPS port (443) with the value specified by the user - (HTTPS_PORT: ${HTTPS_PORT})."
-  sed -i "s/443/${HTTPS_PORT}/g"  /etc/nginx/conf.d/default.conf
+  sed -i "s/443/${HTTPS_PORT}/g"  /etc/nginx/nginx.conf
 fi
 
 
