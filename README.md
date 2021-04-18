@@ -8,19 +8,18 @@ The container image contains lots of tools, as well as a `nginx` web server, whi
 * linux/amd64
 * linux/arm/v7
 * linux/arm64
-* linux/ppc64le
-* linux/s390x
-
-## Variants / image tags:
-* latest, minimal, alpine-minimal ( The main/default **'minimal'** image - Alpine based )
-* extra, alpine-extra (Alpine based image - with **extra tools** )
-* fedora, fedora-minimal ( **'Minimal'** Fedora based image )
-* fedora-extra ( Fedora based image - with **extra tools** )
 
 ## Downloadable from Docker Hub: 
 * [https://hub.docker.com/r/praqma/network-multitool/](https://hub.docker.com/r/praqma/network-multitool/)  (Automated multi-arch Build)
 
-# Tools included in "latest, minimal, alpine-minimal":
+## Variants / image tags:
+* **latest**, minimal, alpine-minimal ( The main/default **'minimal'** image - Alpine based )
+* extra, alpine-extra (Alpine based image - with **extra tools** )
+* fedora, fedora-minimal ( **'Minimal'** Fedora based image )
+* fedora-es-db-tools ( Fedora based image - with **Elasticsearch, etc** )
+
+
+### Tools included in "latest, minimal, alpine-minimal":
 * apk package manager
 * Nginx Web Server (port 80, port 443) - customizable ports!
 * wget, curl
@@ -36,7 +35,7 @@ The container image contains lots of tools, as well as a `nginx` web server, whi
 
 **Size:** 16 MB compressed, 38 MB uncompressed
 
-# Tools included in "extra, alpine-extra":
+### Tools included in "extra, alpine-extra":
 * apk package manager
 * Nginx Web Server (port 80, port 443) - customizable ports!
 * wget, curl, iperf3
@@ -58,7 +57,7 @@ The container image contains lots of tools, as well as a `nginx` web server, whi
 **Size:** 64 MB compressed, 220 MB uncompressed
 
 
-# Tools included in "fedora, fedora-minimal"
+### Tools included in "fedora, fedora-minimal":
 * YUM package manager
 * Nginx Web Server (port 80, port 443) - customizable ports!
 * wget, curl
@@ -71,8 +70,12 @@ The container image contains lots of tools, as well as a `nginx` web server, whi
 * awk, cut, diff, find, grep, sed, vi editor, wc
 * jq
 
+**Size:** 72 MB uncompressed
 
-# Tools included in "fedora-es-db-tools"
+### Tools included in "fedora-es-db-tools":
+
+( **only x64 platform supported for this image variant** )
+
 * YUM package manager
 * Nginx Web Server (port 80, port 443) - customizable ports!
 * wget, curl
@@ -94,13 +97,11 @@ The container image contains lots of tools, as well as a `nginx` web server, whi
 * postfix
 * ssh, sftp
 
-**Size:** 16 MB compressed, 1.6 GB uncompressed
+**Size:** 800 MB compressed, 1.6 GB uncompressed
 
 
 
 **Note:** The SSL certificates are generated for 'localhost', are self signed, and placed in `/certs/` directory. During your testing, ignore the certificate warning/error. While using curl, you can use `-k` to ignore SSL certificate warnings/errors.
-
-
 
 
 # How to use this image? 
@@ -150,17 +151,7 @@ kubectl apply -f kubernetes/multitool-daemonset.yaml
 
 **Notes:** 
 * You can pass additional parameter `--namespace=<your-desired-namespace>` to the above kubectl command.
-* Due to a possibility of something (some service) already listening on port 80 and 443 on the worker nodes, the `daemonset` is configured to run multitool on port `1180` and `11443`.
-
-One could argue that it is possible to simply install the tools on the hosts and get over with it. However, we should keep the infrastructure immutable and not install anything on the hosts. *Ideally* we should never `ssh` to our cluster worker nodes. Some of the reasons are:
-
-* It is generally cumbersome to install the tools since they might be needed on several hosts.
-* New packages may conflict with existing packages, and *may* break some functionality of the host.
-* Removing the tools and dependencies after use could be difficult, as it *may* break some functionality of the host.
-* By using a `daemonset`, it makes it easier to integrate with other resources. e.g. Use volumes for packet capture files, etc.
-* Using the `daemonset` provides a *'cloud native'* approach to provision debugging/testing tools.
-* You can `exec` into the `daemonset`, without needing to SSH into the node.
-
+* Due to a possibility of something (some service) already listening on port 80 and 443 on the worker nodes, the `daemonset` is configured to run multitool on port `1180` and `11443`. You can change this in the YAML file if you want.
 
 
 # Configurable HTTP and HTTPS ports:
@@ -222,6 +213,17 @@ However, if you have a special need, for a special tool, for your special use-ca
 ## Why not use LetsEncrypt for SSL certificates instead of generating your own?
 There is absolutely no need to use LetsEncrypt. This is a testing tool, and validity of SSL certificates does not matter.
 
-# Contributing:
+## Why use a daemonset when troubleshooting host networking on Kubernetes?
+One could argue that it is possible to simply install the tools on the hosts and get over with it. However, we should keep the infrastructure immutable and not install anything on the hosts. *Ideally* we should never `ssh` to our cluster worker nodes. Some of the reasons are:
+
+* It is generally cumbersome to install the tools since they might be needed on several hosts.
+* New packages may conflict with existing packages, and *may* break some functionality of the host.
+* Removing the tools and dependencies after use could be difficult, as it *may* break some functionality of the host.
+* By using a `daemonset`, it makes it easier to integrate with other resources. e.g. Use volumes for packet capture files, etc.
+* Using the `daemonset` provides a *'cloud native'* approach to provision debugging/testing tools.
+* You can `exec` into the `daemonset`, without needing to SSH into the node.
+
+
+## How to contribute to this project?
 Contributions are welcome for packages/tools considered **"absolutely necessary"**, of **"core"** nature, are **"minimal"** in size, and **"have large number of use-cases"**. Remember, the goal is not to create yet another Linux distribution! :)
 
