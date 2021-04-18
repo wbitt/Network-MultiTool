@@ -30,6 +30,7 @@ The container image contains lots of tools, as well as a `nginx` web server, whi
 * ps, netstat
 * gzip, cpio, tar
 * telnet client
+* tcpdump
 * awk, cut, diff, find, grep, sed, vi editor, wc
 * jq
 

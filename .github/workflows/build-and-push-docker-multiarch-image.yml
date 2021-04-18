@@ -2,9 +2,10 @@ name: Docker Image Build and Push - CI Workflow
 
 on:
   push:
-    branches: master
+    branches: alpine-extra
     tags:
-      - alpine-*
+      - extra
+      - alpine-extra
 
 jobs:
   build-and-push-muti-arch-docker-image:
