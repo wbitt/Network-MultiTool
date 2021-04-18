@@ -12,7 +12,7 @@ The container image contains lots of tools, as well as a `nginx` web server, whi
 * linux/s390x
 
 ## Variants / image tags:
-* latest, minimal, alpine ( The main/default **'minimal'** image - Alpine based )
+* latest, minimal, alpine-minimal ( The main/default **'minimal'** image - Alpine based )
 * extra, alpine-extra (Alpine based image - with **extra tools** )
 * fedora, fedora-minimal ( **'Minimal'** Fedora based image )
 * fedora-extra ( Fedora based image - with **extra tools** )
@@ -20,7 +20,7 @@ The container image contains lots of tools, as well as a `nginx` web server, whi
 ## Downloadable from Docker Hub: 
 * [https://hub.docker.com/r/praqma/network-multitool/](https://hub.docker.com/r/praqma/network-multitool/)  (Automated multi-arch Build)
 
-# Tools included in "latest, minimal, alpine" - about 35 MB in size:
+# Tools included in "latest, minimal, alpine-minimal":
 * apk package manager
 * Nginx Web Server (port 80, port 443) - customizable ports!
 * wget, curl
@@ -34,6 +34,7 @@ The container image contains lots of tools, as well as a `nginx` web server, whi
 * awk, cut, diff, find, grep, sed, vi editor, wc
 * jq
 
+**Size:** 16 MB compressed, 38 MB uncompressed
 
 # Tools included in "extra, alpine-extra":
 * apk package manager
@@ -53,6 +54,8 @@ The container image contains lots of tools, as well as a `nginx` web server, whi
 * mysql & postgresql client
 * jq
 * git
+
+**Size:** 64 MB compressed, 220 MB uncompressed
 
 
 # Tools included in "fedora, fedora-minimal"

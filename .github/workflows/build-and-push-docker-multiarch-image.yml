@@ -4,7 +4,8 @@ on:
   push:
     branches: master
     tags:
-      - alpine-*
+      - minimal
+      - alpine-minimal
 
 jobs:
   build-and-push-muti-arch-docker-image:
@@ -33,7 +34,7 @@ jobs:
             TAG=${DOCKERHUB_ORGNAME}/${DOCKER_IMAGE}:latest
           fi  
           if [[ ! -z "${SHORT_REF}" && "${SHORT_REF}" != "master" ]]; then 
-            echo "Found git tag. Setting docker image tag as: '${SHORT_REF}'" 
+            echo "Setting docker image tag as: '${SHORT_REF}'" 
             TAG=${DOCKERHUB_ORGNAME}/${DOCKER_IMAGE}:${SHORT_REF}
           fi
           TAGS="${TAG},${DOCKERHUB_ORGNAME}/${DOCKER_IMAGE}:${SHORT_HASH}"
