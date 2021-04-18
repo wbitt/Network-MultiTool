@@ -4,12 +4,23 @@ MAINTAINER Kamran Azeem & Henrik Høegh (kaz@praqma.net, heh@praqma.net)
 
 EXPOSE 80 443 1180 11443
 
+COPY extra-software.repo /etc/yum.repos.d/
+
 # Install some tools in the container and generate self-signed SSL certificates.
 # Packages are listed in alphabetical order, for ease of readability and ease of maintenance.
 RUN     yum -y install \
             bind-utils cpio diffutils findutils gzip jq \
-            iproute iputils mtr net-tools nginx openssl \
-            procps-ng telnet traceroute vim-minimal wget \
+            iproute iputils logstash mariadb mtr mutt net-tools nginx \
+            openssh-clients openldap openldap-clients openssl \
+            postfix postgresql procps-ng tcpdump td-agent-bit telnet traceroute vim-minimal wget
+
+RUN     curl -sLO https://artifacts.elastic.co/downloads/beats/filebeat/filebeat-7.12.0-x86_64.rpm \
+    &&  curl -sLO https://download.oracle.com/otn_software/linux/instantclient/211000/oracle-instantclient-basiclite-21.1.0.0.0-1.x86_64.rpm \
+    && curl -sLO https://download.oracle.com/otn_software/linux/instantclient/211000/oracle-instantclient-sqlplus-21.1.0.0.0-1.x86_64.rpm \
+    &&  rpm --import https://artifacts.elastic.co/GPG-KEY-elasticsearch \
+    &&  yum -y localinstall https://download.oracle.com/otn_software/linux/instantclient/211000/oracle-instantclient-basic-21.1.0.0.0-1.x86_64.rpm \
+    &&  yum -y localinstall oracle-instantclient-sqlplus-21.1.0.0.0-1.x86_64.rpm \
+    &&  rm -f *.rpm \
     &&  mkdir /certs \
     &&  chmod 700 /certs \
     &&  openssl req \
@@ -39,28 +50,28 @@ CMD ["nginx", "-g", "daemon off;"]
 
 # Build and Push (to dockerhub) instructions:
 # -------------------------------------------
-# docker build -t local/network-multitool .
-# docker tag local/network-multitool praqma/network-multitool
+# docker build -t local/network-multitool:fedora-es-db-tools .
+# docker tag local/network-multitool praqma/network-multitool:fedora-es-db-tools
 # docker login
-# docker push praqma/network-multitool
+# docker push praqma/network-multitool:fedora-es-db-tools
 
 
 # Pull (from dockerhub):
 # ----------------------
-# docker pull praqma/network-multitool
+# docker pull praqma/network-multitool:fedora-es-db-tools
 
 
 # Usage - on Docker:
 # ------------------
-# docker run --rm -it praqma/network-multitool /bin/bash 
+# docker run --rm -it praqma/network-multitool:fedora-es-db-tools /bin/sh
 # OR
-# docker run -d  praqma/network-multitool
+# docker run -d  praqma/network-multitool:fedora-es-db-tools
 # OR
-# docker run -p 80:80 -p 443:443 -d  praqma/network-multitool
+# docker run -p 80:80 -p 443:443 -d  praqma/network-multitool:fedora-es-db-tools
 # OR
-# docker run -e HTTP_PORT=1080 -e HTTPS_PORT=1443 -p 1080:1080 -p 1443:1443 -d  praqma/network-multitool
+# docker run -e HTTP_PORT=1180 -e HTTPS_PORT=11443 -p 1180:1180 -p 11443:11443 -d  praqma/network-multitool:fedora-es-db-tools
 
 
 # Usage - on Kubernetes:
 # ---------------------
-# kubectl run multitool --image=praqma/network-multitool --replicas=1
+# kubectl run multitool --image=praqma/network-multitool:fedora-es-db-tools
