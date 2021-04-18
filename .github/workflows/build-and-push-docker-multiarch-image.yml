@@ -2,9 +2,9 @@ name: Docker Image Build and Push - CI Workflow
 
 on:
   push:
-    branches: master
+    branches: fedora
     tags:
-      - alpine-*
+      - fedora-minimal
 
 jobs:
   build-and-push-muti-arch-docker-image:

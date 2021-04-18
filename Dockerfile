@@ -1,16 +1,15 @@
-FROM alpine:3.12
+FROM fedora:33
 
 MAINTAINER Kamran Azeem & Henrik Høegh (kaz@praqma.net, heh@praqma.net)
 
-EXPOSE 80 443
+EXPOSE 80 443 1180 11443
 
 # Install some tools in the container and generate self-signed SSL certificates.
 # Packages are listed in alphabetical order, for ease of readability and ease of maintenance.
-RUN     apk update \
-    &&  apk add apache2-utils bash bind-tools busybox-extras curl ethtool git \
-                iperf3 iproute2 iputils jq lftp mtr mysql-client \
-                netcat-openbsd net-tools nginx nmap openssh-client openssl \
-                perl-net-telnet postgresql-client procps rsync socat tcpdump tshark wget \
+RUN     yum -y install \
+            bind-utils cpio diffutils findutils gzip jq \
+            iproute iputils mtr net-tools nginx openssl \
+            procps-ng telnet traceroute vim-minimal wget \
     &&  mkdir /certs \
     &&  chmod 700 /certs \
     &&  openssl req \
@@ -29,7 +28,7 @@ COPY docker-entrypoint.sh /
 
 
 # Run the startup script as ENTRYPOINT, which does few things and then starts nginx.
-ENTRYPOINT ["/docker-entrypoint.sh"]
+ENTRYPOINT ["/bin/sh" , "/docker-entrypoint.sh"]
 
 
 # Start nginx in foreground:
