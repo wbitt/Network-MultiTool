@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 
 # If the html directory is mounted, it means user has mounted some content in it.
