@@ -9,7 +9,7 @@ COPY extra-software.repo /etc/yum.repos.d/
 # Install some tools in the container and generate self-signed SSL certificates.
 # Packages are listed in alphabetical order, for ease of readability and ease of maintenance.
 RUN     yum -y install \
-            bind-utils cpio diffutils findutils gzip jq \
+            bind-utils cpio diffutils findutils git gzip jq \
             iproute iputils logstash mariadb mtr mutt net-tools nginx \
             openssh-clients openldap openldap-clients openssl \
             postfix postgresql procps-ng tcpdump td-agent-bit telnet traceroute vim-minimal wget
