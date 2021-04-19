@@ -31,6 +31,7 @@ The container image contains lots of tools, as well as a `nginx` web server, whi
 * tcpdump
 * awk, cut, diff, find, grep, sed, vi editor, wc
 * jq
+* `/bin/sh` shell interpreter - not `/bin/bash`
 
 **Size:** 16 MB compressed, 38 MB uncompressed
 
@@ -52,6 +53,7 @@ The container image contains lots of tools, as well as a `nginx` web server, whi
 * mysql & postgresql client
 * jq
 * git
+* `/bin/bash` shell interpreter
 
 **Size:** 64 MB compressed, 220 MB uncompressed
 
@@ -68,6 +70,8 @@ The container image contains lots of tools, as well as a `nginx` web server, whi
 * telnet client
 * awk, cut, diff, find, grep, sed, vi editor, wc
 * jq
+* `/bin/sh` shell interpreter - not `/bin/bash`
+
 
 **Size:** 72 MB uncompressed
 
