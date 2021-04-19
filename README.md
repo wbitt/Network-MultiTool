@@ -16,7 +16,6 @@ The container image contains lots of tools, as well as a `nginx` web server, whi
 * **latest**, minimal, alpine-minimal ( The main/default **'minimal'** image - Alpine based )
 * extra, alpine-extra (Alpine based image - with **extra tools** )
 * fedora, fedora-minimal ( **'Minimal'** Fedora based image )
-* fedora-es-db-tools ( Fedora based image - with **Elasticsearch, etc** )
 
 
 ### Tools included in "latest, minimal, alpine-minimal":
@@ -72,32 +71,7 @@ The container image contains lots of tools, as well as a `nginx` web server, whi
 
 **Size:** 72 MB uncompressed
 
-### Tools included in "fedora-es-db-tools":
 
-( **only x64 platform supported for this image variant** )
-
-* YUM package manager
-* Nginx Web Server (port 80, port 443) - customizable ports!
-* wget, curl
-* dig, nslookup
-* ip, ifconfig, route, traceroute, tracepath, mtr
-* ping, arp, arping
-* ps, netstat
-* gzip, cpio, tar
-* telnet client
-* awk, cut, diff, find, grep, sed, vi editor, wc
-* jq, git
-* filebeat 
-* fluentbit
-* logstash
-* mutt
-* mysql client, postgresql client, oracle client
-* openldap, openldap-clients
-* openssl
-* postfix
-* ssh, sftp
-
-**Size:** 800 MB compressed, 1.6 GB uncompressed
 
 
 
