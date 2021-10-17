@@ -36,9 +36,9 @@ The container image contains lots of tools, as well as a `nginx` web server, whi
 **Size:** 16 MB compressed, 38 MB uncompressed
 
 ### Tools included in "extra, alpine-extra":
-Everyrthing from "minimal", plus the following:
+Everything from minimal, plus:
 * iperf3
-* mii-tool
+* ethtool, mii-tool
 * nmap
 * ss
 * wireshark, tshark
