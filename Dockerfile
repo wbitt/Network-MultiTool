@@ -9,7 +9,7 @@ EXPOSE 80 443 1180 11443
 RUN     apk update \
     &&  apk add apache2-utils bash bind-tools busybox-extras curl ethtool git \
                 iperf3 iproute2 iputils jq lftp mtr mysql-client \
-                netcat-openbsd net-tools nginx nmap openssh-client openssl \
+                netcat-openbsd net-tools nginx nmap nmap-scripts openssh-client openssl \
                 perl-net-telnet postgresql-client procps rsync socat tcpdump tshark wget \
     &&  mkdir /certs \
     &&  chmod 700 /certs \
