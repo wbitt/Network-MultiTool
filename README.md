@@ -36,13 +36,18 @@ The container image contains lots of tools, as well as a `nginx` web server, whi
 **Size:** 16 MB compressed, 38 MB uncompressed
 
 ### Tools included in "extra, alpine-extra":
-Everything from minimal, plus:
-* iperf3
-* ethtool, mii-tool
-* nmap
-* ss
-* wireshark, tshark
-* ssh client, ftp client, rsync, scp
+* apk package manager
+* Nginx Web Server (port 80, port 443) - customizable ports!
+* wget, curl, iperf3
+* dig, nslookup
+* ip, ifconfig, ethtool, mii-tool, route
+* ping, nmap, arp, arping
+* awk, sed, grep, cut, diff, wc, find, vi editor
+* ps, netstat, ss
+* gzip, cpio, tar
+* tcpdump, wireshark, tshark
+* telnet client, ssh client, ftp client, rsync, scp
+* traceroute, tracepath, mtr
 * netcat (nc), socat
 * ApacheBench (ab)
 * mysql & postgresql client
