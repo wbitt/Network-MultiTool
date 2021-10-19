@@ -1,8 +1,12 @@
 FROM alpine:3.13
 
-MAINTAINER Kamran Azeem & Henrik Høegh (kaz@praqma.net, heh@praqma.net)
+MAINTAINER Kamran Azeem (kamranazeem@gmail.com) & Henrik Høegh (henrikrhoegh@gmail.com)
 
-EXPOSE 80 443 1180 11443
+
+# Using 1180 and 11443, and **not using 8080 or 8443**, 
+#   so this (nginx) does not interfere with anything else the user may be running.
+
+EXPOSE 1180 11443
 
 # Install some tools in the container and generate self-signed SSL certificates.
 # Packages are listed in alphabetical order, for ease of readability and ease of maintenance.
@@ -11,13 +15,13 @@ RUN     apk update \
                 iperf3 iproute2 iputils jq lftp mtr mysql-client \
                 netcat-openbsd net-tools nginx nmap nmap-scripts openssh-client openssl \
                 perl-net-telnet postgresql-client procps rsync socat tcpdump tshark wget \
-    &&  mkdir /certs \
+    &&  addgroup nginx wireshark \
+    &&  mkdir  /certs  /docker /usr/share/nginx/html \
     &&  chmod 700 /certs \
     &&  openssl req \
         -x509 -newkey rsa:2048 -nodes -days 3650 \
         -keyout /certs/server.key -out /certs/server.crt -subj '/CN=localhost'
-
-
+    
 # Copy a simple index.html to eliminate text (index.html) noise which comes with default nginx image.
 # (I created an issue for this purpose here: https://github.com/nginxinc/docker-nginx/issues/234)
 COPY index.html /usr/share/nginx/html/
@@ -29,22 +33,30 @@ COPY index.html /usr/share/nginx/html/
 
 COPY nginx.conf /etc/nginx/nginx.conf
 
-COPY docker-entrypoint.sh /docker-entrypoint.sh
+# To be able to manage the ownership and permissions of entrypoint,
+#   The file has to be copied into  a dedicated directory.
+COPY docker-entrypoint.sh /docker/docker-entrypoint.sh
 
+# It is important to run this command after all the COPY operations.
+RUN chown -R nginx:nginx  /etc/nginx  /usr/share/nginx  /var/run  /run  /certs  /docker
+
+
+# Switch to "non-root" user - nginx . This helps it run on openshift.
+USER nginx
 
 # Start nginx in foreground:
 CMD ["/usr/sbin/nginx", "-g", "daemon off;"]
 
 
-
-# Note: If you have not included the "bash" package, then it is "mandatory" to add "/bin/sh"
+# Note: If you have not included the "bash" package, 
+#         then it is "mandatory" to add "/bin/sh"
 #         in the ENTNRYPOINT instruction. 
 #       Otherwise you will get strange errors when you try to run the container. 
 #       Such as:
 #       standard_init_linux.go:219: exec user process caused: no such file or directory
 
 # Run the startup script as ENTRYPOINT, which does few things and then starts nginx.
-ENTRYPOINT ["/bin/sh", "/docker-entrypoint.sh"]
+ENTRYPOINT ["/bin/sh", "/docker/docker-entrypoint.sh"]
 
 
 
