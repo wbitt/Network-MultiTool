@@ -7,6 +7,11 @@ on:
       - master
       # alpine-extra handles itself "alpine-extra"; and tag "extra" 
       - alpine-extra
+
+    tags:
+      - minimal
+      - alpine-minimal
+      - extra
    
 jobs:
   build-and-push-muti-arch-docker-image:
