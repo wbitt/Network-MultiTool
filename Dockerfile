@@ -38,7 +38,7 @@ COPY nginx.conf /etc/nginx/nginx.conf
 COPY docker-entrypoint.sh /docker/docker-entrypoint.sh
 
 # It is important to run this command after all the COPY operations.
-RUN chown -R nginx:nginx  /etc/nginx  /usr/share/nginx  /var/run  /run  /certs  /docker
+RUN chown -R nginx:nginx  /etc/nginx  /usr/share/nginx  /var/run  /var/lib/nginx  /run  /certs  /docker
 
 
 # Switch to "non-root" user - nginx . This helps it run on openshift.
