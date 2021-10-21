@@ -2,6 +2,10 @@ FROM alpine:3.13
 
 MAINTAINER Kamran Azeem (kamranazeem@gmail.com) & Henrik Høegh (henrikrhoegh@gmail.com)
 
+# Note: This file (in openshift) branch does things a little differently.
+# Reference: https://docs.openshift.com/container-platform/3.3/creating_images/guidelines.html#openshift-container-platform-specific-guidelines
+
+
 
 # Using 1180 and 11443, and **not using 8080 or 8443**, 
 #   so this (nginx) does not interfere with anything else the user may be running.
@@ -17,32 +21,79 @@ RUN     apk update \
                 perl-net-telnet postgresql-client procps rsync socat tcpdump tshark wget \
     &&  addgroup nginx wireshark \
     &&  mkdir  /certs  /docker /usr/share/nginx/html \
-    &&  chmod 700 /certs \
     &&  openssl req \
         -x509 -newkey rsa:2048 -nodes -days 3650 \
         -keyout /certs/server.key -out /certs/server.crt -subj '/CN=localhost'
     
-# Copy a simple index.html to eliminate text (index.html) noise which comes with default nginx image.
-# (I created an issue for this purpose here: https://github.com/nginxinc/docker-nginx/issues/234)
+# Copy a simple index.html to eliminate text (index.html) noise,
+#   which comes with default nginx image.
+#
 COPY index.html /usr/share/nginx/html/
 
 # Copy a custom/simple nginx.conf which contains directives
 #   to redirected access_log and error_log to stdout and stderr.
 # Note: Don't use '/etc/nginx/conf.d/' directory for nginx virtual hosts anymore.
 #   This 'include' will be moved to the root context in Alpine 3.14.
-
+#
 COPY nginx.conf /etc/nginx/nginx.conf
 
 # To be able to manage the ownership and permissions of entrypoint,
 #   The file has to be copied into  a dedicated directory.
-COPY docker-entrypoint.sh /docker/docker-entrypoint.sh
+#
+COPY entrypoint.sh /docker/entrypoint.sh
 
 # It is important to run this command after all the COPY operations.
-RUN chown -R nginx:nginx  /etc/nginx  /usr/share/nginx  /var/run  /var/lib/nginx  /run  /certs  /docker
+RUN     chgrp -R root  /etc/nginx  /usr/share/nginx  /var/lib/nginx  /var/log/nginx \
+          /run  /certs  /docker \
+    &&  chmod -R g=u  /etc/nginx  /usr/share/nginx  /var/lib/nginx  /var/log/nginx \
+          /run  /docker /etc/passwd /etc/group \
+    &&  chmod g+w /etc \
+    &&  chmod 0750 /certs \
+    &&  chmod 0640 /certs/*
+        
 
 
-# Switch to "non-root" user - nginx . This helps it run on openshift.
-USER nginx
+# Notes:
+# * /etc/passwd is made group-writable because we would add a user,
+#     later in entrypoint.sh script.
+# * Also, /etc/group is made group-writable because,
+#     we would add the new user to the wireshark group in entrypoint.sh;
+#     otherwise, wireshark will not run.
+# * chmod g+w /etc allows the /etc directory to be writable by the group.
+#     This is to help sed inline editing done with /etc/group file
+#     in the entrypoint.sh script later.
+#     The '-R' switch is intentionally not used here, because we don't 
+#     want to mess with permissions of entire directory hierarchy under /etc.
+
+
+# Notes about USER:
+# ----------------
+# * Switch to "non-root" user - 1001  - advised by openshift documentation.
+# * This USER <number> directive MUST be set in Dockerfile, 
+#      to satisfy openshift requirements.
+# * This USER ID can be any number out of your imagination (max 65535),
+#      and it does not need to exist anywhere in the system,
+#      and doesn't need to be created before-hand.
+# * It's purpose is just to show/prove to openshift that the docker image
+#     "does" switch away from "root" user. 
+# * Once, openshift sees this, it then "ignores this ID as well",
+#     and runs the image with a new random USER ID.
+# * This new USER ID (uid) is then detected in entrypoint.sh script,
+#     and rest of the tricks are done there.
+# * See entrypoint.sh script in this image for more information.
+
+USER 1001
+
+# The variable below is used by docker entrypoint.sh script,
+#   to create an entry in /etc/passwd with this username, 
+#   and using the (random) uid set by openshift.
+ENV RUNTIME_USER_NAME=okduser
+
+# What does OKD mean? 
+# Few years ago "OpenShift Origin" was renamed to OKD. Not sure why.
+#   Confuses the hell out of people.
+# Silly explanation here: https://learn.redhat.com/t5/Containers-DevOps-OpenShift/What-does-the-acronym-OKD-stand-for/td-p/246
+
 
 # Start nginx in foreground:
 CMD ["/usr/sbin/nginx", "-g", "daemon off;"]
@@ -56,7 +107,7 @@ CMD ["/usr/sbin/nginx", "-g", "daemon off;"]
 #       standard_init_linux.go:219: exec user process caused: no such file or directory
 
 # Run the startup script as ENTRYPOINT, which does few things and then starts nginx.
-ENTRYPOINT ["/bin/sh", "/docker/docker-entrypoint.sh"]
+ENTRYPOINT ["/bin/sh", "/docker/entrypoint.sh"]
 
 
 
