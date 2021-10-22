@@ -26,14 +26,14 @@ Openshift is very strict about how a container image should run. So, the **opens
 * Runs as non-root ; which means some tools (e.g. `traceroute`, `tcptraceroute`, etc, will not work)
 * Listens on ports `1180` and `11443` - **not** `80` and `443`
 * Some executable files are manually set as `setuid`, so those tools remain usable. Tools set with `setuid` are: 
- * apk 
- * arping
- * busybox
- * mii-tool
- * tcpdump
- * tcptraceroute
- * traceroute
- * tshark
+  * apk 
+  * arping
+  * busybox
+  * mii-tool
+  * tcpdump
+  * tcptraceroute
+  * traceroute
+  * tshark
 
 Remember, this *multitool* is purely a troubleshooting tool, and should be used as such. It is not designed to abuse openshift (or any system's) security, nor should it be used to do so.
  
