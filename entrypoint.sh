@@ -43,10 +43,19 @@ if ! whoami &> /dev/null; then
 fi
 
 
+
+
+# ----------------------------------------------------------------------
+
+# Regular stuff:
+# -------------
+
+
+# Custom/user-provided ports:
+# --------------------------
 # * If the env variables HTTP_PORT and HTTPS_PORT are defined, then
 #     modify/Replace default listening ports 1180 and 11443 to whatever the user wants.
 # * If these variables are not defined, then the default ports 1180 and 11443 are used.
-# * Above explanation (and code below) is only valid for "openshift" version of this image.
 
 echo
 
@@ -61,12 +70,8 @@ if [ -n "${HTTPS_PORT}" ]; then
 fi
 
 
-# ----------------------------------------------------------------------
-
-# Regular stuff:
-# -------------
-
-
+# Modify nginx.conf file:
+# ----------------------
 # If the html directory is mounted, it means user has mounted some content in it.
 # In that case, we must not over-write the index.html file.
 
@@ -95,7 +100,6 @@ else
   echo "The directory ${WEB_ROOT} is a volume mount. Will not over-write index.html ."
 
 fi
-
 
 echo
 
