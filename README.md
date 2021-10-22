@@ -19,40 +19,51 @@ The container image contains lots of tools, as well as a `nginx` web server, whi
 * openshift-extra (openshift compatible with **extra tools**) - Ports: **1180, 11443**
 * fedora, fedora-minimal ( **'Minimal'** Fedora based image )
 
-**Note:** Openshift is very strict about how a container image should run. So, the **openshift variant** of the multitool has the following limitations / changes:
+
+### Important notes about openshift variant:
+Openshift is very strict about how a container image should run. So, the **openshift variant** of the multitool has the following limitations / changes:
+
 * Runs as non-root ; which means some tools (e.g. `traceroute`, `tcptraceroute`, etc, will not work)
 * Listens on ports `1180` and `11443` - **not** `80` and `443`
+* Some executable files are manually set as `setuid`, so those tools remain usable. Tools set with `setuid` are: 
+ * apk 
+ * arping
+ * busybox
+ * mii-tool
+ * tcpdump
+ * tcptraceroute
+ * traceroute
+ * tshark
 
-### Tools included in "latest, minimal, alpine-minimal , openshift, openshift-minimal":
+Remember, this *multitool* is purely a troubleshooting tool, and should be used as such. It is not designed to abuse openshift (or any system's) security, nor should it be used to do so.
+ 
+
+## Tools included in "latest, minimal, alpine-minimal , openshift, openshift-minimal":
 * apk package manager
-* Nginx Web Server (port `80`, port `443`) - customizable ports!
-* wget, curl
+* Nginx Web Server (port `80`, port `443`) - with customizable ports!
+* awk, cut, diff, find, grep, sed, vi editor, wc
+* curl, wget
 * dig, nslookup
-* ip, ifconfig, route, traceroute, tracepath, mtr, tcptraceroute (for layer 4 packet tracing)
+* ip, ifconfig, route
+* traceroute, tracepath, mtr, tcptraceroute (for layer 4 packet tracing)
 * ping, arp, arping
 * ps, netstat
 * gzip, cpio, tar
 * telnet client
 * tcpdump
-* awk, cut, diff, find, grep, sed, vi editor, wc
 * jq
 * bash
 
 **Size:** 16 MB compressed, 38 MB uncompressed
 
-### Tools included in "extra, alpine-extra, openshift-extra":
-* apk package manager
-* Nginx Web Server (port 80, port 443) - customizable ports!
-* wget, curl, iperf3
-* dig, nslookup
-* ip, ifconfig, ethtool, mii-tool, route
-* ping, nmap, arp, arping
-* awk, sed, grep, cut, diff, wc, find, vi editor
-* ps, netstat, ss
-* gzip, cpio, tar
-* tcpdump, wireshark, tshark
-* telnet client, ssh client, ftp client, rsync, scp
-* traceroute, tracepath, mtr
+## Tools included in "extra, alpine-extra, openshift-extra":
+All tools from "minimal", plus:
+* iperf3
+* ethtool, mii-tool, route
+* nmap
+* ss
+* tshark
+* ssh client, lftp client, rsync, scp
 * netcat (nc), socat
 * ApacheBench (ab)
 * mysql & postgresql client
@@ -61,7 +72,7 @@ The container image contains lots of tools, as well as a `nginx` web server, whi
 **Size:** 64 MB compressed, 220 MB uncompressed
 
 
-### Tools included in "fedora, fedora-minimal":
+## Tools included in "fedora, fedora-minimal":
 * YUM package manager
 * Nginx Web Server (port 80, port 443) - customizable ports!
 * wget, curl
@@ -76,7 +87,6 @@ The container image contains lots of tools, as well as a `nginx` web server, whi
 * `/bin/sh` shell interpreter - not `/bin/bash`
 
 **Size:** 72 MB uncompressed
-
 
 
 **Note:** The SSL certificates are generated for "localhost", are self signed, and placed in `/certs/` directory. During your testing, ignore the certificate warning/error. While using curl, you can use `-k` to ignore SSL certificate warnings/errors.
