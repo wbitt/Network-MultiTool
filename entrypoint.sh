@@ -14,7 +14,7 @@ if ! whoami &> /dev/null; then
   #   whoami returned error, which is exactly what the above condition checks.
   #   So, now we create an entry for this user in /etc/passwd.
   # i.e. we set the USER_NAME as whatever we set RUNTIME_USER_NAME in Dockerfile,
-  #      The user-id  (uid) as the uid forcefully set by openshift.
+  #      The user-id  (uid) as the random uid forcefully set by openshift.
   #      USER_HOME as '/dev/null',  and login shell as '/sbin/nologin'.
 
   USER_NAME=${RUNTIME_USER_NAME:-default}
@@ -23,23 +23,16 @@ if ! whoami &> /dev/null; then
   USER_SHELL=/sbin/nologin
 
   echo
-  echo "The container is running as UID: ${USER_UID}"
-  echo "The container is running as USER_NAME: ${USER_NAME}"
+  echo "The container is running as USER_NAME: ${USER_NAME} , and UID: ${USER_UID}"
   echo
    
   if [ -w /etc/passwd ]; then
     # RUNTIME_USER_NAME is set in Dockerfile.
     #   If it is not defined there, then simply set it to the word 'default'.
-    echo "${USER_NAME}:x:${USER_UID}:0:${USER_NAME} user:${USER_HOME}:${USER_SHELL}" >> /etc/passwd
+    echo "Adding user ${USER_NAME}:${USER_UID} to /etc/passwd file ..."
+    echo "${USER_NAME}:x:${USER_UID}:0:${USER_NAME} user:${USER_HOME}:${USER_SHELL}" | tee -a /etc/passwd
   fi
 
-  # wireshark stuff:  
-  if [ -w /etc/group ]; then
-    # This won't work as regular user: addgroup ${USER_NAME} wireshark
-    sed -i "s/^\(wireshark\:x\:[[:digit:]]*\)\:.*/\1:${USER_NAME}/g" /etc/group
-    echo "/etc/group updated for wireshark group:"
-    grep wireshark /etc/group
-  fi
 fi
 
 
@@ -53,6 +46,8 @@ fi
 
 # Custom/user-provided ports:
 # --------------------------
+# * nginx.conf in this git branch has ports 1180 and 11443 in it,
+#     to satisfy openshift requirements.
 # * If the env variables HTTP_PORT and HTTPS_PORT are defined, then
 #     modify/Replace default listening ports 1180 and 11443 to whatever the user wants.
 # * If these variables are not defined, then the default ports 1180 and 11443 are used.

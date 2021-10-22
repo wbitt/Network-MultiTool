@@ -14,12 +14,12 @@ EXPOSE 1180 11443
 
 # Install some tools in the container and generate self-signed SSL certificates.
 # Packages are listed in alphabetical order, for ease of readability and ease of maintenance.
+
 RUN     apk update \
-    &&  apk add apache2-utils bash bind-tools busybox-extras curl ethtool git \
-                iperf3 iproute2 iputils jq lftp mtr mysql-client \
-                netcat-openbsd net-tools nginx nmap nmap-scripts openssh-client openssl \
-                perl-net-telnet postgresql-client procps rsync socat tcpdump tshark wget \
-    &&  addgroup nginx wireshark \
+    &&  apk add bash bind-tools busybox-extras curl \
+                iproute2 iputils jq mtr \
+                net-tools nginx openssl \
+                perl-net-telnet procps tcpdump tcptraceroute wget \
     &&  mkdir  /certs  /docker /usr/share/nginx/html \
     &&  openssl req \
         -x509 -newkey rsa:2048 -nodes -days 3650 \
@@ -46,8 +46,7 @@ COPY entrypoint.sh /docker/entrypoint.sh
 RUN     chgrp -R root  /etc/nginx  /usr/share/nginx  /var/lib/nginx  /var/log/nginx \
           /run  /certs  /docker \
     &&  chmod -R g=u  /etc/nginx  /usr/share/nginx  /var/lib/nginx  /var/log/nginx \
-          /run  /docker /etc/passwd /etc/group \
-    &&  chmod g+w /etc \
+          /run  /docker /etc/passwd \
     &&  chmod 0750 /certs \
     &&  chmod 0640 /certs/*
         
@@ -56,14 +55,7 @@ RUN     chgrp -R root  /etc/nginx  /usr/share/nginx  /var/lib/nginx  /var/log/ng
 # Notes:
 # * /etc/passwd is made group-writable because we would add a user,
 #     later in entrypoint.sh script.
-# * Also, /etc/group is made group-writable because,
-#     we would add the new user to the wireshark group in entrypoint.sh;
-#     otherwise, wireshark will not run.
-# * chmod g+w /etc allows the /etc directory to be writable by the group.
-#     This is to help sed inline editing done with /etc/group file
-#     in the entrypoint.sh script later.
-#     The '-R' switch is intentionally not used here, because we don't 
-#     want to mess with permissions of entire directory hierarchy under /etc.
+
 
 
 # Notes about USER:
@@ -87,6 +79,7 @@ USER 1001
 # The variable below is used by docker entrypoint.sh script,
 #   to create an entry in /etc/passwd with this username, 
 #   and using the (random) uid set by openshift.
+#
 ENV RUNTIME_USER_NAME=okduser
 
 # What does OKD mean? 
@@ -134,7 +127,7 @@ ENTRYPOINT ["/bin/sh", "/docker/entrypoint.sh"]
 # OR
 # docker run -p 80:80 -p 443:443 -d  praqma/network-multitool
 # OR
-# docker run -e HTTP_PORT=1080 -e HTTPS_PORT=1443 -p 1080:1080 -p 1443:1443 -d  praqma/network-multitool
+# docker run -e HTTP_PORT=1180 -e HTTPS_PORT=11443 -p 1180:1180 -p 11443:11443 -d  praqma/network-multitool
 
 
 # Usage - on Kubernetes:
