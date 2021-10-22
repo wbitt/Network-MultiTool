@@ -15,12 +15,17 @@ The container image contains lots of tools, as well as a `nginx` web server, whi
 ## Variants / image tags:
 * **latest**, minimal, alpine-minimal ( The main/default **'minimal'** image - Alpine based )
 * extra, alpine-extra (Alpine based image - with **extra tools** )
+* openshift , openshift-minimal (openshift compatible - **minimal**) - Ports: **1180, 11443**
+* openshift-extra (openshift compatible with **extra tools**) - Ports: **1180, 11443**
 * fedora, fedora-minimal ( **'Minimal'** Fedora based image )
 
+**Note:** Openshift is very strict about how a container image should run. So, the **openshift variant** of the multitool has the following limitations / changes:
+* Runs as non-root ; which means some tools (e.g. `traceroute`, `tcptraceroute`, etc, will not work)
+* Listens on ports `1180` and `11443` - **not** `80` and `443`
 
-### Tools included in "latest, minimal, alpine-minimal":
+### Tools included in "latest, minimal, alpine-minimal , openshift, openshift-minimal":
 * apk package manager
-* Nginx Web Server (port 80, port 443) - customizable ports!
+* Nginx Web Server (port `80`, port `443`) - customizable ports!
 * wget, curl
 * dig, nslookup
 * ip, ifconfig, route, traceroute, tracepath, mtr, tcptraceroute (for layer 4 packet tracing)
@@ -35,7 +40,7 @@ The container image contains lots of tools, as well as a `nginx` web server, whi
 
 **Size:** 16 MB compressed, 38 MB uncompressed
 
-### Tools included in "extra, alpine-extra":
+### Tools included in "extra, alpine-extra, openshift-extra":
 * apk package manager
 * Nginx Web Server (port 80, port 443) - customizable ports!
 * wget, curl, iperf3
@@ -74,7 +79,7 @@ The container image contains lots of tools, as well as a `nginx` web server, whi
 
 
 
-**Note:** The SSL certificates are generated for 'localhost', are self signed, and placed in `/certs/` directory. During your testing, ignore the certificate warning/error. While using curl, you can use `-k` to ignore SSL certificate warnings/errors.
+**Note:** The SSL certificates are generated for "localhost", are self signed, and placed in `/certs/` directory. During your testing, ignore the certificate warning/error. While using curl, you can use `-k` to ignore SSL certificate warnings/errors.
 
 ------
 
@@ -85,6 +90,13 @@ The container image contains lots of tools, as well as a `nginx` web server, whi
 ```
 $ docker run  -d praqma/network-multitool
 ```
+
+Then:
+
+```
+$ docker exec -it container-name /bin/bash
+```
+
 
 ### Kubernetes:
 
@@ -98,7 +110,32 @@ Create a deployment:
 $ kubectl create deployment multitool --image=praqma/network-multitool
 ```
 
+Then:
+```
+$ kubectl exec -it pod-name /bin/bash
+```
+
 **Note:** You can pass additional parameter `--namespace=<your-desired-namespace>` to the above kubectl commands.
+
+
+### Openshift:
+
+```
+$ oc new-project test-project-1
+
+$ oc new-app praqma/network-multitool:openshift --name multitool-openshift
+
+$ oc status
+
+$ oc get pods
+
+$ oc logs pod-name
+
+$ oc exec -it pod-name /bin/sh
+
+$ oc port-forward pod-name  1180:1180 11443:11443
+```
+
 
 ## How to use this image on **host network** ?
 
@@ -116,11 +153,11 @@ $ docker run --network host -d praqma/network-multitool
 $ docker run --network host -e HTTP_PORT=1180 -e HTTPS_PORT=11443 -d praqma/network-multitool
 ```
 
-### kubernetes:
+### Kubernetes:
 For Kubernetes, there is YAML/manifest file `multitool-daemonset.yaml` in the `kubernetes` directory, that will run an instance of the multitool on all hosts in the cluster using host networking.
 
 ```
-kubectl apply -f kubernetes/multitool-daemonset.yaml
+$ kubectl apply -f kubernetes/multitool-daemonset.yaml
 ```
 
 **Notes:** 
@@ -132,24 +169,28 @@ kubectl apply -f kubernetes/multitool-daemonset.yaml
 There are times when one may want to join this (multitool) container to another container's IP namespace for troubleshooting, or on the host network. This is true for both Docker and Kubernetes platforms. During that time if the container in question is a web server (nginx, apache, etc), or a reverse-proxy (traefik, nginx, haproxy, etc), then network-multitool cannot join it in the same IP namespace on Docker, and similarly it cannot join the same pod on Kubernetes. This happens because network multitool also runs a web server on port 80 (and 443), and this results in port conflict on the same IP address. To help in this sort of troubleshooting, there are two environment variables **HTTP_PORT** and **HTTPS_PORT** , which you can use to provide the values of your choice instead of 80 and 443. When the container starts, it uses the values provided by you/user to listen for incoming connections. Below is an example:
 
 ```
-[kamran@kworkhorse network-multitool]$ docker run -e HTTP_PORT=1180 -e HTTPS_PORT=11443 -p 1180:1180 -p 11443:11443 -d local/network-multitool
+$ docker run -e HTTP_PORT=1180 -e HTTPS_PORT=11443 \
+    -p 1180:1180 -p 11443:11443 -d local/network-multitool
 4636efd4660c2436b3089ab1a979e5ce3ae23055f9ca5dc9ffbab508f28dfa2a
 
-[kamran@kworkhorse network-multitool]$ docker ps
+
+$ docker ps
 CONTAINER ID        IMAGE                     COMMAND                  CREATED             STATUS              PORTS                                                             NAMES
 4636efd4660c        local/network-multitool   "/docker-entrypoint.…"   4 seconds ago       Up 3 seconds        80/tcp, 0.0.0.0:1180->1180/tcp, 443/tcp, 0.0.0.0:11443->11443/tcp   recursing_nobel
 6e8b6ed8bfa6        nginx                     "nginx -g 'daemon of…"   56 minutes ago      Up 56 minutes       80/tcp                                                            nginx
 
-[kamran@kworkhorse network-multitool]$ curl http://localhost:1180
-Praqma Network MultiTool (with NGINX) - 4636efd4660c - 172.17.0.3/16
 
-[kamran@kworkhorse network-multitool]$ curl -k https://localhost:11443
-Praqma Network MultiTool (with NGINX) - 4636efd4660c - 172.17.0.3/16
-[kamran@kworkhorse network-multitool]$ 
+$ curl http://localhost:1180
+Praqma Network MultiTool (with NGINX) - 4636efd4660c - 172.17.0.3/16 - HTTP: 1180 , HTTPS: 11443
+
+
+$ curl -k https://localhost:11443
+Praqma Network MultiTool (with NGINX) - 4636efd4660c - 172.17.0.3/16 - HTTP: 1180 , HTTPS: 11443
 ```  
 
 If these environment variables are absent/not-provided, the container will listen on normal/default ports 80 and 443.
 
+------
 
 # FAQs
 ## Why this multitool runs a web-server?
@@ -166,7 +207,7 @@ $ kubectl run multitool --image=praqma/network-multitool
 ```
 
 
-The multitool container starts as web server. Then, you simply connect to it using:
+The multitool container starts as web server - so it remains `UP`. Then, you simply connect to it using:
 ```
 $ docker exec -it some-silly-container-name /bin/sh 
 ```

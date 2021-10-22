@@ -1,6 +1,6 @@
 FROM alpine:3.13
 
-MAINTAINER Kamran Azeem & Henrik Høegh (kaz@praqma.net, heh@praqma.net)
+MAINTAINER Kamran Azeem & Henrik Høegh (kamranazeem@gmail.com, henrikrhoegh@gmail.com)
 
 EXPOSE 80 443 1180 11443
 
@@ -11,7 +11,7 @@ RUN     apk update \
                 iproute2 iputils jq mtr \
                 net-tools nginx openssl \
                 perl-net-telnet procps tcpdump tcptraceroute wget \
-    &&  mkdir /certs \
+    &&  mkdir /certs /docker \
     &&  chmod 700 /certs \
     &&  openssl req \
         -x509 -newkey rsa:2048 -nodes -days 3650 \
@@ -31,7 +31,7 @@ COPY index.html /usr/share/nginx/html/
 
 COPY nginx.conf /etc/nginx/nginx.conf
 
-COPY docker-entrypoint.sh /docker-entrypoint.sh
+COPY entrypoint.sh /docker/entrypoint.sh
 
 
 # Start nginx in foreground:
@@ -46,7 +46,7 @@ CMD ["/usr/sbin/nginx", "-g", "daemon off;"]
 #       standard_init_linux.go:219: exec user process caused: no such file or directory
 
 # Run the startup script as ENTRYPOINT, which does few things and then starts nginx.
-ENTRYPOINT ["/bin/sh", "/docker-entrypoint.sh"]
+ENTRYPOINT ["/bin/sh", "/docker/entrypoint.sh"]
 
 
 
