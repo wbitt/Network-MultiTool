@@ -22,6 +22,9 @@ Being a big fan and user of the multitools, such as the [Leatherman Wave](https:
 
 So I went ahead and created [praqma/network-multitool](https://hub.docker.com/r/praqma/network-multitool/). I am a RedHat fan, so I based my image on CENTOS:7 . Intially I had Apache as web server, but later I replaced it with nginx - nginx being very light weight and very fast.
 
+## Note about name/org change - Dec 2021:
+Earlier, I maintained this tool, as `praqma/network-multitool`. Praqma was bought by another company, and now the **"Praqma"** brand is being dismantled. This means the network-multitool's git and docker repositories must go. It was decided by the current representatives of the company to hand it over to me so I can continue maintaining it. So, except the small change in the repository name, nothing has changed. The docker repository to pull this image is now: [https://hub.docker.com/r/wbitt/network-multitool](https://hub.docker.com/r/wbitt/network-multitool)
+
 ## Example usage:
 This image can be used in any environment which allows you to run containers; docker, docker-swarm, kubernetes, etc. Here are few eamples on how you can run and use this image:
 
@@ -29,10 +32,10 @@ This image can be used in any environment which allows you to run containers; do
 
 First, pull the image, though not entirely necessary.
 ```
-[kamran@kworkhorse ~]$ docker pull praqma/network-multitool
+[kamran@kworkhorse ~]$ docker pull wbitt/network-multitool
 Using default tag: latest
-Trying to pull repository docker.io/praqma/network-multitool ... 
-sha256:970b1ef9c12f4368c67b1fdbcaaedf4030861dae8263a410701fe040d59d1317: Pulling from docker.io/praqma/network-multitool
+Trying to pull repository docker.io/wbitt/network-multitool ... 
+sha256:970b1ef9c12f4368c67b1fdbcaaedf4030861dae8263a410701fe040d59d1317: Pulling from docker.io/wbitt/network-multitool
 
 93857f76ae30: Already exists 
 6c1308705eea: Pull complete 
@@ -43,13 +46,13 @@ dfe620fcbab4: Pull complete
 1d9e1b44b10a: Pull complete 
 4e922c058a8f: Pull complete 
 Digest: sha256:970b1ef9c12f4368c67b1fdbcaaedf4030861dae8263a410701fe040d59d1317
-Status: Downloaded newer image for docker.io/praqma/network-multitool:latest
+Status: Downloaded newer image for docker.io/wbitt/network-multitool:latest
 [kamran@kworkhorse ~]$ 
 ```
 
 **Interactive:**
 ```
-[kamran@kworkhorse ~]$ docker run --rm -it praqma/network-multitool bash
+[kamran@kworkhorse ~]$ docker run --rm -it wbitt/network-multitool bash
 
 [root@92288413e051 /]# nslookup yahoo.com
 Server:		192.168.100.1
@@ -68,7 +71,7 @@ Address: 206.190.36.45
 
 **Datached / Daemon mode:**
 ```
-[kamran@kworkhorse ~]$ docker run -P -d  praqma/network-multitool
+[kamran@kworkhorse ~]$ docker run -P -d  wbitt/network-multitool
 a76d156c674f2b61c9b9fb10f87c645620c4fcbe88a13162546379abc9a87f14
 [kamran@kworkhorse ~]$ 
 ```
@@ -76,7 +79,7 @@ a76d156c674f2b61c9b9fb10f87c645620c4fcbe88a13162546379abc9a87f14
 ```
 [kamran@kworkhorse ~]$ docker ps
 CONTAINER ID        IMAGE                      COMMAND             CREATED             STATUS              PORTS                                           NAMES
-a76d156c674f        praqma/network-multitool   "/start_nginx.sh"   31 seconds ago      Up 30 seconds       0.0.0.0:32769->80/tcp, 0.0.0.0:32768->443/tcp   silly_franklin
+a76d156c674f        wbitt/network-multitool   "/start_nginx.sh"   31 seconds ago      Up 30 seconds       0.0.0.0:32769->80/tcp, 0.0.0.0:32768->443/tcp   silly_franklin
 [kamran@kworkhorse ~]$
 ```
 
@@ -102,7 +105,7 @@ Content-Length: 304
 First run the container image as **deployment (detached/daemon mode)**:
 
 ```
-[kamran@kworkhorse ~]$ kubectl run multitool --image=praqma/network-multitool
+[kamran@kworkhorse ~]$ kubectl run multitool --image=wbitt/network-multitool
 deployment "multitool" created
 [kamran@kworkhorse ~]$ 
 ```

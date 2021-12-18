@@ -22,7 +22,7 @@ spec:
         effect: NoSchedule
       containers:
       - name: network-multitool
-        image: praqma/network-multitool
+        image: wbitt/network-multitool
         env:
         - name: HTTP_PORT
           value: "1180"

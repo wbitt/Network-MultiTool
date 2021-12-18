@@ -22,12 +22,12 @@ if [ -z "${MOUNT_CHECK}" ] ; then
   CONTAINER_IP=$(ip -j route get 1 | jq -r '.[0] .prefsrc')
 
   # Reduced the information in just one line. It overwrites the default text.
-  echo -e "Praqma Network MultiTool (with NGINX) - ${HOSTNAME} - ${CONTAINER_IP} - HTTP: ${HTTP_PORT:-80} , HTTPS: ${HTTPS_PORT:-443}" | tee  ${WEB_ROOT}/index.html 
+  echo -e "WBITT Network MultiTool (with NGINX) - ${HOSTNAME} - ${CONTAINER_IP} - HTTP: ${HTTP_PORT:-80} , HTTPS: ${HTTPS_PORT:-443} . (Formerly praqma/network-multitool)" | tee  ${WEB_ROOT}/index.html 
 else
   echo "The directory ${WEB_ROOT} is a volume mount."
   echo "Therefore, will not over-write index.html"
   echo "Only logging the container characteristics:"
-  echo -e "Praqma Network MultiTool (with NGINX) - ${HOSTNAME} - ${CONTAINER_IP} - HTTP: ${HTTP_PORT:-80} , HTTPS: ${HTTPS_PORT:-443}"
+  echo -e "WBITT Network MultiTool (with NGINX) - ${HOSTNAME} - ${CONTAINER_IP} - HTTP: ${HTTP_PORT:-80} , HTTPS: ${HTTPS_PORT:-443} . (Formerly praqma/network-multitool)"
 
 fi
 
