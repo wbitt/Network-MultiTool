@@ -1,4 +1,4 @@
-FROM fedora:33
+FROM fedora:35
 
 MAINTAINER Kamran Azeem & Henrik Høegh (kaz@praqma.net, heh@praqma.net)
 
