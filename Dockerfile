@@ -1,4 +1,4 @@
-FROM fedora:33
+FROM fedora:35
 
 MAINTAINER Kamran Azeem & Henrik Høegh (kaz@praqma.net, heh@praqma.net)
 
@@ -35,11 +35,11 @@ COPY index.html /usr/share/nginx/html/
 # Copy a custom nginx.conf with log files redirected to stderr and stdout
 COPY nginx.conf /etc/nginx/nginx.conf
 
-COPY docker-entrypoint.sh /
+COPY entrypoint.sh /
 
 
 # Run the startup script as ENTRYPOINT, which does few things and then starts nginx.
-ENTRYPOINT ["/bin/sh" , "/docker-entrypoint.sh"]
+ENTRYPOINT ["/bin/sh" , "/entrypoint.sh"]
 
 
 # Start nginx in foreground:
