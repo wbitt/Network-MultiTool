@@ -1,4 +1,4 @@
-FROM alpine:3.13
+FROM alpine:3.15
 
 MAINTAINER Kamran Azeem (kamranazeem@gmail.com) & Henrik Høegh (henrikrhoegh@gmail.com)
 
