@@ -15,7 +15,7 @@ if [ -z "${MOUNT_CHECK}" ] ; then
   CONTAINER_IP=$(ip addr show eth0 | grep -w inet| awk '{print $2}')
 
   # Reduced the information in just one line. It overwrites the default text.
-  echo -e "Praqma Network MultiTool (with NGINX) - ${HOSTNAME} - ${CONTAINER_IP}" > ${WEB_ROOT}/index.html 
+  echo -e "WBITT Network MultiTool (with NGINX) - ${HOSTNAME} - ${CONTAINER_IP} - HTTP: ${HTTP_PORT:-80} , HTTPS: ${HTTPS_PORT:-443} . (Formerly praqma/network-multitool)" | tee  ${WEB_ROOT}/index.html 
 else
   echo "The directory ${WEB_ROOT} is a volume mount. Will not over-write index.html ."
 
