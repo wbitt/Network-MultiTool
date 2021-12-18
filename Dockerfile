@@ -1,4 +1,4 @@
-FROM alpine:3.13
+FROM alpine:3.15
 
 MAINTAINER Kamran Azeem & Henrik Høegh (kaz@praqma.net, heh@praqma.net)
 
