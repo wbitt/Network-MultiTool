@@ -21,7 +21,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       DOCKER_IMAGE: network-multitool
-      DOCKERHUB_ORGNAME: praqma
+      DOCKERHUB_ORGNAME: wbitt
       DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
       # 
       # DOCKERHUB_USERNAME and DOCKERHUB_TOKEN are to be set in the GITHUB WEB UI,
