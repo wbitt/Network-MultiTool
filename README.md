@@ -1,11 +1,20 @@
-# WBITT Network-Multitool
+# WBITT Network-Multitool (Formerly `praqma/Network-MultiTool`)
 
 A (**multi-arch**) multitool for container/network testing and troubleshooting. The main docker image is based on Alpine Linux. There is a Fedora variant to be used in environments which require the image to be based only on RedHat Linux, or any of it's derivatives.
 
 The container image contains lots of tools, as well as a `nginx` web server, which listens on port `80` and `443` by default. The web server helps to run this container-image in a straight-forward way, so you can simply `exec` into the container and use various tools.
 
 ## Note about name/org change:
-Earlier, I maintained this tool with Henrik, as `praqma/network-multitool`. Praqma was bought by another company, and now the **"Praqma"** brand is being dismantled. This means the network-multitool's git and docker repositories must go. It was decided by the current representatives of the company to hand it over to me so I can continue maintaining it. So, except the small change in the repository name, nothing has changed. The docker repository to pull this image is now: [https://hub.docker.com/r/wbitt/network-multitool](https://hub.docker.com/r/wbitt/network-multitool)
+Earlier, I created and maintained this tool with [Henrik](https://github.com/hoeghh), as `praqma/network-multitool`. Praqma was bought by another company, and now the **"Praqma"** brand is being dismantled. This means the network-multitool's git and docker repositories must go. It was decided by the current representatives of the company to hand it over to me so I can continue maintaining it. So, apart from a small change in the repository name, nothing has changed. 
+
+The docker repository to pull this image is now: [https://hub.docker.com/r/wbitt/network-multitool](https://hub.docker.com/r/wbitt/network-multitool)
+
+Or:
+
+```
+docker pull wbitt/network-multitool
+```
+
 
 ## Supported platforms: 
 * linux/386
