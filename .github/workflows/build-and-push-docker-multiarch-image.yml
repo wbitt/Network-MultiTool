@@ -5,9 +5,8 @@ name: Docker Image Build and Push - CI Workflow
 
 on:
   push:
-    branches: fedora-es-db-tools
-    tags:
-      - fedora-dbtools
+    branches: 
+      - fedora-es-db-tools
 
 jobs:
   build-and-push-muti-arch-docker-image:
