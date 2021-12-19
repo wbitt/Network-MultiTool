@@ -2,7 +2,8 @@ name: Docker Image Build and Push - CI Workflow
 
 on:
   push:
-    branches: fedora
+    branches: 
+      - fedora
     tags:
       - fedora-minimal
 
