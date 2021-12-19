@@ -3,17 +3,8 @@ name: Docker Image Build and Push - CI Workflow
 on:
   push:
     branches:
-      # master handles: "latest"; and tags "minimal" and "alpine-minimal"
-      - master
-      # alpine-extra handles itself "alpine-extra"; and tag "extra" 
-      - alpine-extra
       - openshift
-      - openshift-extra
-
     tags:
-      - minimal
-      - alpine-minimal
-      - extra
       - openshift-minimal
    
 jobs:
