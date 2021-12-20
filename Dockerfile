@@ -1,6 +1,6 @@
 FROM alpine:3.15
 
-MAINTAINER Kamran Azeem & Henrik Høegh (kaz@praqma.net, heh@praqma.net)
+MAINTAINER Kamran Azeem & Henrik Høegh (kamranazeem@gmail.com, henrikrhoegh@gmail.com )
 
 EXPOSE 80 443 1180 11443
 
