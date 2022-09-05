@@ -1,0 +1,40 @@
+---
+
+name: Scheduled scan of container images for vulnerabilities
+
+'on':
+  schedule:
+    - cron: 0 16 * * 5
+  workflow_dispatch:
+
+env:
+  DOCKER_IMAGE: network-multitool
+  DOCKERHUB_ORGNAME: xanmanning
+
+jobs:
+  scan:
+    name: trivy scan
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        tag:
+          - latest
+          - extras
+    steps:
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: ${{ env.DOCKERHUB_ORGNAME }}/${{ env.DOCKER_IMAGE }}:${{ matrix.tag }}
+          format: 'json'
+          exit-code: '0'
+          output: /tmp/scan.json
+          ignore-unfixed: true
+          vuln-type: 'os,library'
+          severity: 'CRITICAL,HIGH'
+
+      - name: Output scan results
+        id: scan-results
+        run: |
+          RESULTS_COUNT="$(jq -r '[.Results[]?.Vulnerabilities[]?.VulnerabilityID] | sort | unique | length' /tmp/scan.json)"
+          echo "::set-output name=results-count::${RESULTS_COUNT}"
