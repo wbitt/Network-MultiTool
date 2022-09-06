@@ -103,6 +103,6 @@ jobs:
           context: .
           build-args: |
             INSTALL_EXTRAS=${{ matrix.install_extras }}
-          platforms: linux/amd64,linux/arm64
+          platforms: linux/amd64,linux/arm64,linux/ppc64le
           push: true
           tags: ${{ steps.prep.outputs.tags }}
