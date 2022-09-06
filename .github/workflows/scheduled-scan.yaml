@@ -26,15 +26,7 @@ jobs:
         uses: aquasecurity/trivy-action@master
         with:
           image-ref: ${{ env.DOCKERHUB_ORGNAME }}/${{ env.DOCKER_IMAGE }}:${{ matrix.tag }}
-          format: 'json'
-          exit-code: '0'
-          output: /tmp/scan.json
+          exit-code: '1'
           ignore-unfixed: true
           vuln-type: 'os,library'
           severity: 'CRITICAL,HIGH'
-
-      - name: Output scan results
-        id: scan-results
-        run: |
-          RESULTS_COUNT="$(jq -r '[.Results[]?.Vulnerabilities[]?.VulnerabilityID] | sort | unique | length' /tmp/scan.json)"
-          echo "::set-output name=results-count::${RESULTS_COUNT}"
