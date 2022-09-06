@@ -6,13 +6,14 @@ The main container image is based on Alpine Linux and contains lots of tools.
 ## Why this image?
 
 Whilst much the same to WBITT's image, this one is a little bit more
-opinionated as to which tools should be included. This image will eventually
-be scanned weekly with Trivy and rebuilt if there are vulnerabilities found.
+opinionated as to which tools should be included. This image will be scanned
+weekly with Trivy and rebuilt if there are vulnerabilities found.
 
 ## Supported platforms:
 
 - linux/amd64
 - linux/arm64
+- linux/ppc64le
 
 ## Downloadable from Docker Hub:
 
