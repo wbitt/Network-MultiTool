@@ -51,6 +51,7 @@ RUN apk update --no-cache && \
             nmap \
             nmap-scripts \
             openssh-client \
+            redis \
             rsync \
             socat \
             tshark \
