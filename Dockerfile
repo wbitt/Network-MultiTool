@@ -12,22 +12,24 @@ MAINTAINER Kamran Azeem (kamranazeem@gmail.com) & Henrik Høegh (henrikrhoegh@gm
 
 EXPOSE 1180 11443
 
-# Install some tools in the container and generate self-signed SSL certificates.
-# Packages are listed in alphabetical order, for ease of readability and ease of maintenance.
-# Some files need setuid permissions to be able to run on openshift.
-#   Otherwise those tools are unusable.
+# * Install some tools in the container and generate self-signed SSL certificates.
+# * Packages are listed in alphabetical order, for ease of readability and ease of maintenance.
+# * Some files need setuid permissions to be able to run on openshift,
+#     otherwise those tools will be unusable.
 
 RUN     apk update \
-    &&  apk add bash bind-tools busybox-extras curl \
-                iproute2 iputils jq mtr \
-                net-tools nginx openssl \
-                perl-net-telnet procps tcpdump tcptraceroute wget \
-    &&  chmod u+s /sbin/apk /bin/busybox  /usr/sbin/arping \
-          /usr/bin/tcpdump /usr/bin/tcptraceroute \
+    &&  apk add apache2-utils bash bind-tools busybox-extras curl ethtool git \
+                iperf3 iproute2 iputils jq lftp mtr mysql-client \
+                netcat-openbsd net-tools nginx nmap nmap-scripts openssh-client openssl \
+                perl-net-telnet postgresql-client procps rsync socat \
+                tcpdump tcptraceroute tshark wget \
+    &&  chmod u+s /sbin/apk /bin/busybox  /usr/sbin/arping /sbin/ip \
+                  /usr/bin/iperf3 /usr/sbin/mtr /usr/bin/nc /usr/bin/nmap \
+                  /usr/bin/tcpdump /usr/bin/tcptraceroute /usr/bin/tshark \
     &&  mkdir  /certs  /docker /usr/share/nginx/html \
     &&  openssl req \
-        -x509 -newkey rsa:2048 -nodes -days 3650 \
-        -keyout /certs/server.key -out /certs/server.crt -subj '/CN=localhost'
+          -x509 -newkey rsa:2048 -nodes -days 3650 \
+          -keyout /certs/server.key -out /certs/server.crt -subj '/CN=localhost'
     
 # Copy a simple index.html to eliminate text (index.html) noise,
 #   which comes with default nginx image.
