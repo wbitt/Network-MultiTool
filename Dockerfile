@@ -1,4 +1,4 @@
-FROM fedora:38
+FROM registry.fedoraproject.org/fedora:38
 
 MAINTAINER Kamran Azeem & Henrik Høegh (kamranazeem@gmail.com, henrikrhoegh@gmail.com )
 
