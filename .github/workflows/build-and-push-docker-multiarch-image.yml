@@ -55,7 +55,7 @@ jobs:
             # On master branch, create 'latest' for the minimal image
             type=raw,value=latest,enable=${{ github.ref == 'refs/heads/master' && matrix.name == 'minimal' }}
             # and 'master-<variant>' for others
-            type=raw,value=master-${{ matrix.name }},enable=${{ github.ref == 'refs/heads/master' && matrix.name != 'minimal' }}
+            type=raw,value=${{ matrix.name }},enable=${{ github.ref == 'refs/heads/master' && matrix.name != 'minimal' }}
 
             # On version tags (e.g., 3.22.0), create semver tags
             # For minimal image: 3.22.0, 3.22
