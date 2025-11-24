@@ -24,8 +24,8 @@ jobs:
             dockerfile: Dockerfile.extra
           - name: openshift
             dockerfile: Dockerfile.openshift
-          - name: fedora
-            dockerfile: Dockerfile.fedora
+#          - name: fedora
+#            dockerfile: Dockerfile.fedora
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
