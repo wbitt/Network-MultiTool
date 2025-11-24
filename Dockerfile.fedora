@@ -1,4 +1,4 @@
-FROM fedora:42
+FROM fedora:41
 
 LABEL maintainer="Kamran Azeem & Henrik Høegh (kamranazeem@gmail.com, henrikrhoegh@gmail.com)"
 
