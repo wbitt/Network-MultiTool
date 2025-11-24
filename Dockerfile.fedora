@@ -1,4 +1,4 @@
-FROM registry.fedoraproject.org/fedora:43
+FROM fedora:42
 
 LABEL maintainer="Kamran Azeem & Henrik Høegh (kamranazeem@gmail.com, henrikrhoegh@gmail.com)"
 
@@ -12,7 +12,7 @@ RUN     yum -y install \
             iproute iputils mtr net-tools nginx openssl \
             procps-ng telnet traceroute vim-minimal wget \
     &&  yum clean all \
-    &&  mkdir /certs \
+    &&  mkdir /certs /docker \
     &&  chmod 700 /certs \
     &&  openssl req \
         -x509 -newkey rsa:2048 -nodes -days 3650 \
@@ -26,11 +26,11 @@ COPY index.html /usr/share/nginx/html/
 # Copy a custom nginx.conf with log files redirected to stderr and stdout
 COPY nginx.conf /etc/nginx/nginx.conf
 
-COPY entrypoint.sh /
+COPY entrypoint.sh /docker/entrypoint.sh
 
 
 # Run the startup script as ENTRYPOINT, which does few things and then starts nginx.
-ENTRYPOINT ["/bin/sh" , "/entrypoint.sh"]
+ENTRYPOINT ["/bin/sh" , "/docker/entrypoint.sh"]
 
 
 # Start nginx in foreground:
