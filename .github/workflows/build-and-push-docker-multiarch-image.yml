@@ -50,20 +50,21 @@ jobs:
         with:
           images: wbitt/network-multitool
           tags: |
-            # On master branch, create 'latest' for the minimal image and 'master-<variant>' for others
+            # Add git-sha tag for all builds from this workflow
+            type=sha,prefix=sha-
+            # On master branch, create 'latest' for the minimal image
             type=raw,value=latest,enable=${{ github.ref == 'refs/heads/master' && matrix.name == 'minimal' }}
-            type=raw,value=master-{{name}},enable=${{ github.ref == 'refs/heads/master' && matrix.name != 'minimal' }}
+            # and 'master-<variant>' for others
+            type=raw,value=master-${{ matrix.name }},enable=${{ github.ref == 'refs/heads/master' && matrix.name != 'minimal' }}
 
             # On version tags (e.g., 3.22.0), create semver tags
-            # For minimal image: 3.22.0, 3.22, 3
+            # For minimal image: 3.22.0, 3.22
             type=semver,pattern={{version}},enable=${{ startsWith(github.ref, 'refs/tags/') && matrix.name == 'minimal' }}
             type=semver,pattern={{major}}.{{minor}},enable=${{ startsWith(github.ref, 'refs/tags/') && matrix.name == 'minimal' }}
-            type=semver,pattern={{major}},enable=${{ startsWith(github.ref, 'refs/tags/') && matrix.name == 'minimal' }}
-
-            # For other variants: 3.22.0-extra, 3.22-extra, 3-extra
-            type=semver,pattern={{version}},suffix=-{{name}},enable=${{ startsWith(github.ref, 'refs/tags/') && matrix.name != 'minimal' }}
-            type=semver,pattern={{major}}.{{minor}},suffix=-{{name}},enable=${{ startsWith(github.ref, 'refs/tags/') && matrix.name != 'minimal' }}
-            type=semver,pattern={{major}},suffix=-{{name}},enable=${{ startsWith(github.ref, 'refs/tags/') && matrix.name != 'minimal' }}
+            
+            # For other variants: 3.22.0-extra, 3.22-extra
+            type=semver,pattern={{version}},suffix=-${{ matrix.name }},enable=${{ startsWith(github.ref, 'refs/tags/') && matrix.name != 'minimal' }}
+            type=semver,pattern={{major}}.{{minor}},suffix=-${{ matrix.name }},enable=${{ startsWith(github.ref, 'refs/tags/') && matrix.name != 'minimal' }}
             
 
       - name: Build and push Docker image
