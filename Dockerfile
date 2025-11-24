@@ -1,16 +1,18 @@
-FROM alpine:3.18
+FROM alpine:3.22
 
-MAINTAINER Kamran Azeem & Henrik Høegh (kamranazeem@gmail.com, henrikrhoegh@gmail.com)
+LABEL maintainer="Kamran Azeem & Henrik Høegh (kamranazeem@gmail.com, henrikrhoegh@gmail.com)"
 
 EXPOSE 80 443 1180 11443
 
 # Install some tools in the container and generate self-signed SSL certificates.
 # Packages are listed in alphabetical order, for ease of readability and ease of maintenance.
 RUN     apk update \
-    &&  apk add bash bind-tools busybox-extras curl \
+    &&  apk add --no-cache \
+                bash bind-tools busybox-extras curl \
                 iproute2 iputils jq mtr \
                 net-tools nginx openssl \
                 perl-net-telnet procps tcpdump tcptraceroute wget \
+    &&  rm -rf /var/cache/apk/* \
     &&  mkdir /certs /docker \
     &&  chmod 700 /certs \
     &&  openssl req \
@@ -21,7 +23,7 @@ RUN     apk update \
 # Copy a simple index.html to eliminate text (index.html) noise which comes with default nginx image.
 # (I created an issue for this purpose here: https://github.com/nginxinc/docker-nginx/issues/234)
 
-COPY index.html /usr/share/nginx/html/
+COPY  --chown=nginx:nginx  index.html /usr/share/nginx/html/
 
 
 # Copy a custom/simple nginx.conf which contains directives
@@ -29,10 +31,12 @@ COPY index.html /usr/share/nginx/html/
 # Note: Don't use '/etc/nginx/conf.d/' directory for nginx virtual hosts anymore.
 #   This 'include' will be moved to the root context in Alpine 3.14.
 
-COPY nginx.conf /etc/nginx/nginx.conf
+COPY --chown=nginx:nginx  nginx.conf /etc/nginx/nginx.conf
 
 COPY entrypoint.sh /docker/entrypoint.sh
 
+# Add a healthcheck to the Dockerfile
+HEALTHCHECK --interval=30s --timeout=3s CMD curl -f http://localhost/ || exit 1
 
 # Start nginx in foreground:
 CMD ["/usr/sbin/nginx", "-g", "daemon off;"]
