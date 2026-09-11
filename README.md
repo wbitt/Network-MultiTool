@@ -149,6 +149,13 @@ Then:
 kubectl exec -it pod-name /bin/bash
 ```
 
+To troubleshoot a pod that is already running, attach an ephemeral debug container to it. The image starts nginx by default, so give `kubectl debug` a shell as the command, otherwise the session is attached to nginx and never shows a prompt:
+```bash
+kubectl debug -it --image=wbitt/network-multitool pod-name --target container-name -- bash
+```
+
+On container runtimes whose default capabilities do not include `NET_RAW` (CRI-O, for example), add `--profile=netadmin` (kubectl 1.27 and newer) so `tcpdump` and `ping` work inside the debug container.
+
 **Note:** You can pass additional parameter `--namespace=<your-desired-namespace>` to the above kubectl commands.
 
 ### OpenShift
