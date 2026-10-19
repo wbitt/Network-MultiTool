@@ -14,6 +14,7 @@ EXPOSE 80 443 1180 11443
 # Debian's nginx package runs as 'www-data' and does not create a 'nginx' user,
 #   so one is created here to keep using the same nginx.conf as the other variants.
 RUN     apt-get update \
+    &&  DEBIAN_FRONTEND=noninteractive apt-get upgrade -y \
     &&  DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
                 bash bind9-dnsutils bind9-host ca-certificates cpio curl \
                 inetutils-telnet iproute2 iputils-arping iputils-ping iputils-tracepath jq \
