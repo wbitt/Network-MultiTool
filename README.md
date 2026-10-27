@@ -35,9 +35,9 @@ docker pull wbitt/network-multitool
 
 The tags for each variant:
 
-* minimal: `latest`, `3.24.3`, `3.24`, `sha-<short-sha>-minimal`
-* extra: `extra`, `3.24.3-extra`, `3.24-extra`, `sha-<short-sha>-extra`
-* openshift: `openshift`, `3.24.3-openshift`, `3.24-openshift`, `sha-<short-sha>-openshift`
+* minimal: `latest`, `3.24.4`, `3.24`, `sha-<short-sha>-minimal`
+* extra: `extra`, `3.24.4-extra`, `3.24-extra`, `sha-<short-sha>-extra`
+* openshift: `openshift`, `3.24.4-openshift`, `3.24-openshift`, `sha-<short-sha>-openshift`
 
 Tags from older layouts are not produced anymore. If you still use one of them, switch to the tags above.
 
@@ -228,6 +228,8 @@ If these environment variables are absent/not-provided, the container will liste
 # Keeping the image current
 
 The Dockerfiles pin the Alpine base to an exact patch. At the time of writing it is `3.24.3`. I check the Alpine release page once a month. When there is a new 3.24 patch, I bump the base in all three Dockerfiles, rebuild, run the smoke tests, and publish a new release tag.
+
+The image release tag and the Alpine patch are separate numbers. A release can be `3.24.4` while the base is `3.24.3`. Check `/etc/alpine-release` inside the image for the real base.
 
 There is no dependency bot on purpose. I do not take automated PRs for this repository.
 
