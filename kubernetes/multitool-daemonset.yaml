@@ -17,12 +17,15 @@ spec:
         app: network-multitool
     spec:
       hostNetwork: true
+      dnsPolicy: ClusterFirstWithHostNet
+      terminationGracePeriodSeconds: 30
       tolerations:
       - operator: Exists
         effect: NoSchedule
       containers:
       - name: network-multitool
-        image: wbitt/network-multitool
+        image: wbitt/network-multitool:3.24.3
+        imagePullPolicy: IfNotPresent
         env:
         - name: HTTP_PORT
           value: "1180"
@@ -35,12 +38,29 @@ spec:
           name: https-port
         resources:
           requests:
-            cpu: "1m"
-            memory: "20Mi"
-          limits:
             cpu: "10m"
-            memory: "20Mi"
+            memory: "32Mi"
+          limits:
+            cpu: "500m"
+            memory: "256Mi"
+        # Keep these probe ports in sync with HTTP_PORT.
+        startupProbe:
+          httpGet:
+            path: /
+            port: 1180
+          failureThreshold: 30
+          periodSeconds: 2
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 1180
+          periodSeconds: 10
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 1180
+          periodSeconds: 20
         securityContext:
           runAsUser: 0
           capabilities:
-            add: ["NET_ADMIN"]
+            add: ["NET_ADMIN", "NET_RAW"]

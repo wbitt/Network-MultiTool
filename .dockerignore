@@ -1,0 +1,9 @@
+.git
+.github
+.gitignore
+kubernetes
+tests
+*.md
+*.jpg
+LICENSE
+TODO.md

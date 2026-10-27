@@ -3,21 +3,23 @@
 # Reference: https://docs.openshift.com/container-platform/3.3/creating_images/guidelines.html#openshift-container-platform-specific-guidelines
 
 
-FROM alpine:3.22
+FROM alpine:3.24.3
 
 LABEL maintainer="Kamran Azeem & Henrik Høegh (kamranazeem@gmail.com, henrikrhoegh@gmail.com)"
 
 
-# Using 1180 and 11443, and **not using 8080 or 8443**, 
+# Using 1180 and 11443, and **not using 8080 or 8443**,
 #   so this (nginx) does not interfere with anything else the user may be running.
 
 EXPOSE 1180 11443
 
 # Install some tools in the container and generate self-signed SSL certificates.
 # Packages are listed in alphabetical order, for ease of readability and ease of maintenance.
-# Some files need setuid permissions to be able to run on openshift.
-#   Otherwise those tools are unusable.
+# This variant runs as a non-root user. There are no setuid binaries.
+#   Packet capture tools need NET_RAW, which a restricted SCC does not grant.
+#   Use a privileged or hostNetwork workload for capture.
 
+# hadolint ignore=DL3018
 RUN     apk update \
     &&  apk add --no-cache \
                 bash bind-tools busybox-extras curl \
@@ -25,8 +27,7 @@ RUN     apk update \
                 net-tools nginx openssh-client openssl \
                 perl-net-telnet procps rsync tcpdump tcptraceroute wget \
     &&  rm -rf /var/cache/apk/* \
-    &&  chmod u+s /sbin/apk /bin/busybox  /usr/sbin/arping \
-          /usr/bin/tcpdump /usr/bin/tcptraceroute \
+    &&  chmod u-s /bin/ping \
     &&  mkdir  /certs  /docker /usr/share/nginx/html \
     &&  openssl req \
         -x509 -newkey rsa:2048 -nodes -days 3650 \
@@ -60,8 +61,8 @@ RUN     chgrp -R root  /etc/nginx  /usr/share/nginx  /var/lib/nginx  /var/log/ng
 
 
 # Notes:
-# * /etc/passwd is made group-writable because we would add a user,
-#     later in entrypoint.sh script.
+# * /etc/passwd is made group-writable because the entrypoint adds a user
+#     entry for the random UID that openshift assigns at run time.
 
 
 
@@ -78,7 +79,7 @@ RUN     chgrp -R root  /etc/nginx  /usr/share/nginx  /var/lib/nginx  /var/log/ng
 # * Once, openshift sees this, it then "ignores this ID as well",
 #     and runs the image with a new random USER ID.
 # * This new USER ID (uid) is then detected in entrypoint.sh script,
-#     and rest of the tricks are done there.
+#     and an entry is added to /etc/passwd for it.
 # * See entrypoint.sh script in this image for more information.
 
 USER 1001
@@ -88,6 +89,12 @@ USER 1001
 #   and using the (random) uid set by openshift.
 #
 ENV RUNTIME_USER_NAME=okduser
+
+# The openshift variant listens on 1180 and 11443 by default.
+#   The entrypoint rewrites nginx.conf from 80/443 to these ports at startup.
+#
+ENV HTTP_PORT=1180
+ENV HTTPS_PORT=11443
 
 # What does OKD mean? 
 # Few years ago "OpenShift Origin" was renamed to OKD. Not sure why.
@@ -101,7 +108,7 @@ CMD ["/usr/sbin/nginx", "-g", "daemon off;"]
 
 # Note: If you have not included the "bash" package, 
 #         then it is "mandatory" to add "/bin/sh"
-#         in the ENTNRYPOINT instruction. 
+#         in the ENTRYPOINT instruction. 
 #       Otherwise you will get strange errors when you try to run the container. 
 #       Such as:
 #       standard_init_linux.go:219: exec user process caused: no such file or directory
@@ -115,29 +122,28 @@ ENTRYPOINT ["/bin/sh", "/docker/entrypoint.sh"]
 
 # Build and Push (to dockerhub) instructions:
 # -------------------------------------------
-# docker build -t local/network-multitool .
-# docker tag local/network-multitool praqma/network-multitool
+# docker build -f Dockerfile.openshift -t local/network-multitool:openshift .
+# docker tag local/network-multitool:openshift wbitt/network-multitool:openshift
 # docker login
-# docker push praqma/network-multitool
+# docker push wbitt/network-multitool:openshift
 
 
 # Pull (from dockerhub):
 # ----------------------
-# docker pull praqma/network-multitool
+# docker pull wbitt/network-multitool:openshift
 
 
 # Usage - on Docker:
 # ------------------
-# docker run --rm -it praqma/network-multitool /bin/bash 
+# docker run --rm -it wbitt/network-multitool:openshift /bin/bash
 # OR
-# docker run -d  praqma/network-multitool
+# docker run -d  wbitt/network-multitool:openshift
 # OR
-# docker run -p 80:80 -p 443:443 -d  praqma/network-multitool
+# docker run -p 1180:1180 -p 11443:11443 -d  wbitt/network-multitool:openshift
 # OR
-# docker run -e HTTP_PORT=1180 -e HTTPS_PORT=11443 -p 1180:1180 -p 11443:11443 -d  praqma/network-multitool
+# docker run -e HTTP_PORT=1180 -e HTTPS_PORT=11443 -p 1180:1180 -p 11443:11443 -d  wbitt/network-multitool:openshift
 
 
 # Usage - on Kubernetes:
 # ---------------------
-# kubectl run multitool --image=praqma/network-multitool --replicas=1
-
+# kubectl run multitool --image=wbitt/network-multitool:openshift --replicas=1

@@ -1,3 +1,7 @@
+# NOT BUILT BY THE PIPELINE.
+# This file is kept for reference until the Fedora variant is revived or removed.
+# It is not published and is not covered by the smoke tests.
+
 FROM fedora:41
 
 LABEL maintainer="Kamran Azeem & Henrik Høegh (kamranazeem@gmail.com, henrikrhoegh@gmail.com)"

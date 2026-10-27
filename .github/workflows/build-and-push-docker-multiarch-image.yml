@@ -12,9 +12,39 @@ on:
       - master
   workflow_dispatch:
 
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 jobs:
-  build-and-push:
+  lint:
+    name: Lint
     runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Run ShellCheck
+        run: docker run --rm -v "$PWD:/mnt" -w /mnt koalaman/shellcheck@sha256:bb596a0d169b85ddd81d8b6d3a2ff6d5baf5fca10b97f575ebc647c3dff62b3d -s sh entrypoint.sh tests/smoke-test.sh
+
+      - name: Run Hadolint
+        run: |
+          docker run --rm -i hadolint/hadolint@sha256:32dac94127fd60b7b7e3fbfc65e1383b9b5e25c9bfd7b8536de7a539fe68a12d < Dockerfile
+          docker run --rm -i hadolint/hadolint@sha256:32dac94127fd60b7b7e3fbfc65e1383b9b5e25c9bfd7b8536de7a539fe68a12d < Dockerfile.extra
+          docker run --rm -i hadolint/hadolint@sha256:32dac94127fd60b7b7e3fbfc65e1383b9b5e25c9bfd7b8536de7a539fe68a12d < Dockerfile.openshift
+
+      - name: Run Actionlint
+        run: docker run --rm -v "$PWD:/repo" -w /repo rhysd/actionlint@sha256:b1934ee5f1c509618f2508e6eb47ee0d3520686341fec936f3b79331f9315667 -color
+
+  test:
+    name: Test ${{ matrix.name }}
+    needs: lint
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
     strategy:
       fail-fast: false
       matrix:
@@ -25,57 +55,102 @@ jobs:
             dockerfile: Dockerfile.extra
           - name: openshift
             dockerfile: Dockerfile.openshift
-#          - name: fedora
-#            dockerfile: Dockerfile.fedora
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v3
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
+        uses: docker/setup-buildx-action@f87e5991a6d7451dcb8d9637bfbc97413f497069 # v4.4.1
+
+      - name: Build amd64 image
+        uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc # v7.4.0
+        with:
+          context: .
+          file: ${{ matrix.dockerfile }}
+          platforms: linux/amd64
+          load: true
+          tags: local/network-multitool:${{ matrix.name }}
+          cache-from: type=gha,scope=${{ matrix.name }}
+          cache-to: type=gha,mode=max,scope=${{ matrix.name }}
+
+      - name: Run smoke tests
+        run: sh tests/smoke-test.sh local/network-multitool:${{ matrix.name }} ${{ matrix.name }}
+
+      - name: Scan image with Trivy
+        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
+        with:
+          scan-type: image
+          image-ref: local/network-multitool:${{ matrix.name }}
+          severity: CRITICAL,HIGH
+          ignore-unfixed: true
+          exit-code: ${{ startsWith(github.ref, 'refs/tags/') && '1' || '0' }}
+          format: table
+
+  publish:
+    name: Publish ${{ matrix.name }}
+    if: startsWith(github.ref, 'refs/tags/') && !contains(github.ref_name, '-') && github.repository == 'wbitt/Network-MultiTool'
+    needs: test
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: minimal
+            dockerfile: Dockerfile
+          - name: extra
+            dockerfile: Dockerfile.extra
+          - name: openshift
+            dockerfile: Dockerfile.openshift
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@99012661954931238ded8c8b007157a8430204e1 # v4.4.0
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@f87e5991a6d7451dcb8d9637bfbc97413f497069 # v4.4.1
 
       - name: Log in to Docker Hub
-        if: github.event_name != 'pull_request'
-        uses: docker/login-action@v3
+        uses: docker/login-action@81c6f93d4bc991e510b342a00b419b3bb4efc5c6 # v4.7.0
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Docker meta
+      - name: Docker metadata
         id: meta
-        uses: docker/metadata-action@v5
+        uses: docker/metadata-action@dc802804100637a589fabce1cb79ff13a1411302 # v6.2.0
         with:
           images: wbitt/network-multitool
+          flavor: |
+            latest=false
           tags: |
-            # Add git-sha tag for all builds from this workflow
-            type=sha,prefix=sha-
-            # On master branch, create 'latest' for the minimal image
-            type=raw,value=latest,enable=${{ github.ref == 'refs/heads/master' && matrix.name == 'minimal' }}
-            # and 'master-<variant>' for others
-            type=raw,value=${{ matrix.name }},enable=${{ github.ref == 'refs/heads/master' && matrix.name != 'minimal' }}
+            # Every variant gets its own immutable SHA tag.
+            type=sha,prefix=sha-,suffix=-${{ matrix.name }}
 
-            # On version tags (e.g., 3.22.0), create semver tags
-            # For minimal image: 3.22.0, 3.22
-            type=semver,pattern={{version}},enable=${{ startsWith(github.ref, 'refs/tags/') && matrix.name == 'minimal' }}
-            type=semver,pattern={{major}}.{{minor}},enable=${{ startsWith(github.ref, 'refs/tags/') && matrix.name == 'minimal' }}
-            
-            # For other variants: 3.22.0-extra, 3.22-extra
-            type=semver,pattern={{version}},suffix=-${{ matrix.name }},enable=${{ startsWith(github.ref, 'refs/tags/') && matrix.name != 'minimal' }}
-            type=semver,pattern={{major}}.{{minor}},suffix=-${{ matrix.name }},enable=${{ startsWith(github.ref, 'refs/tags/') && matrix.name != 'minimal' }}
-            
+            # Minimal variant: version and major.minor tags.
+            type=semver,pattern={{version}},enable=${{ matrix.name == 'minimal' }}
+            type=semver,pattern={{major}}.{{minor}},enable=${{ matrix.name == 'minimal' && !contains(github.ref_name, '-') }}
 
-      - name: Build and push Docker image
-        uses: docker/build-push-action@v5
+            # Other variants: the same tags with a suffix.
+            type=semver,pattern={{version}},suffix=-${{ matrix.name }},enable=${{ matrix.name != 'minimal' }}
+            type=semver,pattern={{major}}.{{minor}},suffix=-${{ matrix.name }},enable=${{ matrix.name != 'minimal' && !contains(github.ref_name, '-') }}
+
+            # Moving tags, stable releases only.
+            type=raw,value=latest,enable=${{ matrix.name == 'minimal' && !contains(github.ref_name, '-') }}
+            type=raw,value=${{ matrix.name }},enable=${{ matrix.name != 'minimal' && !contains(github.ref_name, '-') }}
+
+      - name: Build and push image
+        uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc # v7.4.0
         with:
           context: .
           file: ${{ matrix.dockerfile }}
           platforms: linux/386,linux/amd64,linux/arm/v7,linux/arm64
-          push: ${{ github.event_name != 'pull_request' }}
+          push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
-
+          cache-from: type=gha,scope=${{ matrix.name }}
+          cache-to: type=gha,mode=max,scope=${{ matrix.name }}
+          sbom: true
+          provenance: mode=max
