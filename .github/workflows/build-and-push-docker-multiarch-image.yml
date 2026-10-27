@@ -80,6 +80,9 @@ jobs:
         uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
         with:
           scan-type: image
+          # The image intentionally contains the self-signed test certificate key,
+          # so scan for vulnerabilities only, not embedded secrets.
+          scanners: vuln
           image-ref: local/network-multitool:${{ matrix.name }}
           severity: CRITICAL,HIGH
           ignore-unfixed: true
