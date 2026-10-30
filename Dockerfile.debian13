@@ -9,7 +9,8 @@ EXPOSE 80 443 1180 11443
 # Debian names of the Alpine packages:
 #   bind-tools -> bind9-dnsutils + bind9-host ; busybox-extras (telnet) -> inetutils-telnet ;
 #   iputils -> iputils-ping + iputils-arping + iputils-tracepath ; mtr -> mtr-tiny (plain 'mtr' pulls in GTK).
-#   traceroute, nc, vi and cpio come from busybox on Alpine, so they need their own packages here.
+#   traceroute, nc, vi and cpio come from busybox on Alpine, so they need their own packages here;
+#   vi is nvi, the small BSD vi.
 #   curl and wget only "recommend" ca-certificates on Debian, so it is listed explicitly.
 # Debian's nginx package runs as 'www-data' and does not create a 'nginx' user,
 #   so one is created here to keep using the same nginx.conf as the other variants.
@@ -19,8 +20,8 @@ RUN     apt-get update \
     &&  DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
                 bash bind9-dnsutils bind9-host ca-certificates cpio curl \
                 inetutils-telnet iproute2 iputils-arping iputils-ping iputils-tracepath jq \
-                mtr-tiny net-tools netcat-openbsd nginx openssh-client openssl \
-                procps rsync tcpdump tcptraceroute traceroute vim-tiny wget \
+                mtr-tiny net-tools netcat-openbsd nginx nvi openssh-client openssl \
+                procps rsync tcpdump tcptraceroute traceroute wget \
     &&  rm -rf /var/lib/apt/lists/* \
     &&  useradd --system --user-group --no-create-home --shell /usr/sbin/nologin nginx \
     &&  mkdir -p /certs /docker /usr/share/nginx/html \
