@@ -1,6 +1,6 @@
 # WBITT Network-Multitool (Formerly `praqma/Network-MultiTool`)
 
-A (**multi-arch**) multitool for container/network testing and troubleshooting. The image is based on Alpine Linux and comes in three variants: a minimal image, an image with extra tools, and an OpenShift-compatible image.
+A (**multi-arch**) multitool for container/network testing and troubleshooting. The image is based on Alpine Linux and comes in three variants: a minimal image, an image with extra tools, and an OpenShift-compatible image. The minimal and extra images are also built on Debian 13 (trixie), for environments that standardize on Debian based images.
 
 The container image contains lots of tools, as well as a `nginx` web server, which listens on port `80` and `443` by default. The web server helps to run this container-image in a straight-forward way, so you can simply `exec` into the container and use various tools.
 
@@ -32,12 +32,15 @@ docker pull wbitt/network-multitool
 * **minimal**: the default Alpine image. It is the smallest one, and `latest` points to it.
 * **extra**: the minimal image plus the extra tools listed below.
 * **openshift**: the minimal tools, but it runs as a non-root user and listens on `1180` and `11443`.
+* **debian13** and **debian13-extra**: the minimal and the extra tools on `debian:trixie-slim`.
 
 The tags for each variant:
 
 * minimal: `latest`, `3.24.4`, `3.24`, `sha-<short-sha>-minimal`
 * extra: `extra`, `3.24.4-extra`, `3.24-extra`, `sha-<short-sha>-extra`
 * openshift: `openshift`, `3.24.4-openshift`, `3.24-openshift`, `sha-<short-sha>-openshift`
+* debian13: `debian13`, `3.24.4-debian13`, `3.24-debian13`, `sha-<short-sha>-debian13`
+* debian13-extra: `debian13-extra`, `3.24.4-debian13-extra`, `3.24-debian13-extra`, `sha-<short-sha>-debian13-extra`
 
 Tags from older layouts are not produced anymore. If you still use one of them, switch to the tags above.
 
@@ -97,6 +100,12 @@ All tools from the minimal image, plus:
 The openshift variant includes the same tools as the minimal variant, with the limitations listed above. Its compressed size is about 25 MB, and its uncompressed size is about 106 MB.
 
 Sizes change with every Alpine and package update. These were measured in October 2026.
+
+## Tools included in the Debian 13 variants
+
+`debian13` has the tools of the minimal image and `debian13-extra` those of the extra image, installed
+from Debian 13 (trixie) packages, with `apt` as the package manager. Both also include `host`, and
+`netcat (nc)` is already in `debian13`.
 
 **Note:** The SSL certificates are generated for "localhost", are self signed, and are placed in `/certs/` directory. During your testing, ignore the certificate warning/error. While using curl, you can use `-k` to ignore SSL certificate warnings/errors.
 
@@ -249,7 +258,11 @@ The smoke test is in `tests/smoke-test.sh`. Run it against a locally built image
 sh tests/smoke-test.sh local/network-multitool:minimal minimal
 sh tests/smoke-test.sh local/network-multitool:extra extra
 sh tests/smoke-test.sh local/network-multitool:openshift openshift
+sh tests/smoke-test.sh local/network-multitool:debian13 minimal
+sh tests/smoke-test.sh local/network-multitool:debian13-extra extra
 ```
+
+The Debian variants use the minimal and the extra profile.
 
 It checks the nginx configuration, the tools, the default and custom ports, the healthcheck, invalid port input, a container restart, the mounted-html log line, and the OpenShift runtime user.
 

@@ -1,0 +1,85 @@
+FROM debian:trixie-slim
+
+LABEL maintainer="Kamran Azeem & Henrik Høegh (kamranazeem@gmail.com, henrikrhoegh@gmail.com)"
+
+EXPOSE 80 443 1180 11443
+
+# Install some tools in the container and generate self-signed SSL certificates.
+# Packages are listed in alphabetical order, for ease of readability and ease of maintenance.
+# Debian names of the Alpine packages:
+#   bind-tools -> bind9-dnsutils + bind9-host ; busybox-extras (telnet) -> inetutils-telnet ;
+#   iputils -> iputils-ping + iputils-arping + iputils-tracepath ; mtr -> mtr-tiny (plain 'mtr' pulls in GTK).
+#   traceroute, nc, vi and cpio come from busybox on Alpine, so they need their own packages here.
+#   curl and wget only "recommend" ca-certificates on Debian, so it is listed explicitly.
+# Debian's nginx package runs as 'www-data' and does not create a 'nginx' user,
+#   so one is created here to keep using the same nginx.conf as the other variants.
+RUN     apt-get update \
+    &&  DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+                bash bind9-dnsutils bind9-host ca-certificates cpio curl \
+                inetutils-telnet iproute2 iputils-arping iputils-ping iputils-tracepath jq \
+                mtr-tiny net-tools netcat-openbsd nginx openssh-client openssl \
+                procps rsync tcpdump tcptraceroute traceroute vim-tiny wget \
+    &&  rm -rf /var/lib/apt/lists/* \
+    &&  useradd --system --user-group --no-create-home --shell /usr/sbin/nologin nginx \
+    &&  mkdir -p /certs /docker /usr/share/nginx/html \
+    &&  chmod 700 /certs \
+    &&  openssl req \
+        -x509 -newkey rsa:2048 -nodes -days 3650 \
+        -keyout /certs/server.key -out /certs/server.crt -subj '/CN=localhost'
+
+
+# Copy a simple index.html to eliminate text (index.html) noise which comes with default nginx image.
+COPY  --chown=nginx:nginx  index.html /usr/share/nginx/html/
+
+
+# Copy a custom/simple nginx.conf which contains directives
+#   to redirected access_log and error_log to stdout and stderr.
+COPY --chown=nginx:nginx  nginx.conf /etc/nginx/nginx.conf
+
+COPY entrypoint.sh /docker/entrypoint.sh
+
+# Add a healthcheck to the Dockerfile
+HEALTHCHECK --interval=30s --timeout=3s CMD curl -f http://localhost/ || exit 1
+
+# Start nginx in foreground:
+CMD ["/usr/sbin/nginx", "-g", "daemon off;"]
+
+
+# Note: On Debian, /bin/sh is dash, whose built-in "echo" does not understand "-e",
+#         which entrypoint.sh uses. bash is always present on Debian, so the
+#         (shared) entrypoint script is run with bash here.
+
+# Run the startup script as ENTRYPOINT, which does few things and then starts nginx.
+ENTRYPOINT ["/bin/bash", "/docker/entrypoint.sh"]
+
+
+
+###################################################################################################
+
+# Build and Push (to dockerhub) instructions:
+# -------------------------------------------
+# docker build -t local/network-multitool:debian13 -f Dockerfile.debian13 .
+# docker tag local/network-multitool:debian13 wbitt/network-multitool:debian13
+# docker login
+# docker push wbitt/network-multitool:debian13
+
+
+# Pull (from dockerhub):
+# ----------------------
+# docker pull wbitt/network-multitool:debian13
+
+
+# Usage - on Docker:
+# ------------------
+# docker run --rm -it wbitt/network-multitool:debian13 /bin/bash
+# OR
+# docker run -d  wbitt/network-multitool:debian13
+# OR
+# docker run -p 80:80 -p 443:443 -d  wbitt/network-multitool:debian13
+# OR
+# docker run -e HTTP_PORT=1180 -e HTTPS_PORT=11443 -p 1180:1180 -p 11443:11443 -d  wbitt/network-multitool:debian13
+
+
+# Usage - on Kubernetes:
+# ---------------------
+# kubectl run multitool --image=wbitt/network-multitool:debian13

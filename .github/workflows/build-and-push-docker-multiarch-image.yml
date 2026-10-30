@@ -55,6 +55,13 @@ jobs:
             dockerfile: Dockerfile.extra
           - name: openshift
             dockerfile: Dockerfile.openshift
+          # The Debian variants run the smoke test with the matching Alpine profile.
+          - name: debian13
+            dockerfile: Dockerfile.debian13
+            profile: minimal
+          - name: debian13-extra
+            dockerfile: Dockerfile.debian13-extra
+            profile: extra
     steps:
       - name: Checkout repository
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -74,7 +81,7 @@ jobs:
           cache-to: type=gha,mode=max,scope=${{ matrix.name }}
 
       - name: Run smoke tests
-        run: sh tests/smoke-test.sh local/network-multitool:${{ matrix.name }} ${{ matrix.name }}
+        run: sh tests/smoke-test.sh local/network-multitool:${{ matrix.name }} ${{ matrix.profile || matrix.name }}
 
       - name: Scan image with Trivy
         uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
@@ -105,6 +112,10 @@ jobs:
             dockerfile: Dockerfile.extra
           - name: openshift
             dockerfile: Dockerfile.openshift
+          - name: debian13
+            dockerfile: Dockerfile.debian13
+          - name: debian13-extra
+            dockerfile: Dockerfile.debian13-extra
     steps:
       - name: Checkout repository
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
