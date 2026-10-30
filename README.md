@@ -107,6 +107,9 @@ Sizes change with every Alpine and package update. These were measured in Octobe
 from Debian 13 (trixie) packages, with `apt` as the package manager. Both also include `host`, and
 `netcat (nc)` is already in `debian13`.
 
+**Size:** `debian13` is about 48 MB compressed and about 123 MB uncompressed; `debian13-extra` is
+about 178 MB compressed and about 562 MB uncompressed.
+
 **Note:** The SSL certificates are generated for "localhost", are self signed, and are placed in `/certs/` directory. During your testing, ignore the certificate warning/error. While using curl, you can use `-k` to ignore SSL certificate warnings/errors.
 
 The private key is baked into the image, so it is public. Treat this certificate as a test fixture only, and never trust it for anything real.
@@ -248,6 +251,9 @@ The Dockerfiles pin the Alpine base to an exact patch. At the time of writing it
 The image release tag and the Alpine patch are separate numbers. A release can be `3.24.4` while the base is `3.24.3`. Check `/etc/alpine-release` inside the image for the real base.
 
 There is no dependency bot on purpose. I do not take automated PRs for this repository.
+
+The Debian 13 variants build on `debian:trixie-slim` and run `apt-get upgrade` before installing, so
+every release build picks up Debian's current point-release and security packages.
 
 The release process is short:
 
